@@ -1,0 +1,3052 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<meta name="description" content="NeuroDex is a personal thalamocortical dysrhythmia (TCD) phenotyping and neurofeedback pilot. Read theta/gamma balance off a NeuroSky headset, train against your own baseline, and collect 51 neuroscience specimens along the way.">
+<title>NeuroDex — Phenotype the rhythm. Collect the nervous system.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#000; --bg2:#070707; --panel:#0C0C0C; --panel2:#131313; --panel3:#1A1A1A;
+  --line:rgba(255,255,255,.11); --line2:rgba(255,255,255,.2); --line3:rgba(255,255,255,.34);
+  --txt:#fff; --dim:rgba(255,255,255,.64); --faint:rgba(255,255,255,.40); --ghost:rgba(255,255,255,.22);
+  --t1:#CFCFCF; --t2:#A6A6A6; --t3:#787878; --t4:#2C2C2C; --t5:#080808;
+  --disp:"Chakra Petch",system-ui,sans-serif;
+  --sans:"Inter",system-ui,-apple-system,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  --nav:58px; --tab:calc(60px + env(safe-area-inset-bottom));
+  --max:1180px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+html,body{margin:0;min-height:100%;background:var(--bg)}
+body{font-family:var(--sans);color:var(--txt);font-size:15px;line-height:1.6;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden}
+/* faint grid + grain, the only ambient texture in the whole theme */
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.5;
+  background-image:linear-gradient(rgba(255,255,255,.028) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.028) 1px,transparent 1px);
+  background-size:64px 64px;
+  mask-image:radial-gradient(ellipse 90% 60% at 50% 0%,#000 20%,transparent 78%);
+  -webkit-mask-image:radial-gradient(ellipse 90% 60% at 50% 0%,#000 20%,transparent 78%)}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;padding:0}
+input,select,textarea{font:inherit;color:inherit}
+a{color:inherit;text-decoration:none}
+.hidden{display:none!important}
+img,video,canvas,svg{display:block;max-width:100%}
+
+/* ---------- type ---------- */
+h1,h2,h3,h4{font-family:var(--disp);font-weight:700;margin:0;letter-spacing:-.01em;line-height:1.06}
+.h-xl{font-size:clamp(40px,8.4vw,86px);text-transform:uppercase;letter-spacing:-.025em}
+.h-lg{font-size:clamp(28px,4.6vw,46px);text-transform:uppercase;letter-spacing:-.02em}
+.h-md{font-size:clamp(21px,2.8vw,28px);text-transform:uppercase}
+.h-sm{font-size:17px;text-transform:uppercase;letter-spacing:.01em}
+.eb{font-family:var(--mono);font-size:10.5px;letter-spacing:.26em;text-transform:uppercase;color:var(--faint)}
+.eb.on{color:#fff}
+.lede{font-size:clamp(15px,1.6vw,18px);color:var(--dim);line-height:1.65;max-width:62ch}
+.dim{color:var(--dim)}.faint{color:var(--faint)}
+.mono{font-family:var(--mono)}
+.num{font-variant-numeric:tabular-nums}
+.rule{height:1px;background:var(--line);border:0;margin:0}
+
+/* ---------- layout ---------- */
+.wrap{width:100%;max-width:var(--max);margin:0 auto;padding:0 22px;position:relative;z-index:1}
+.sec{padding:clamp(56px,9vw,110px) 0;position:relative;z-index:1}
+.sec.tight{padding:clamp(38px,6vw,66px) 0}
+.grid2{display:grid;grid-template-columns:1fr;gap:34px}
+.grid3{display:grid;grid-template-columns:1fr;gap:16px}
+.grid4{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(min-width:760px){
+  .grid2{grid-template-columns:1fr 1fr;gap:56px;align-items:start}
+  .grid3{grid-template-columns:repeat(3,1fr);gap:20px}
+  .grid4{grid-template-columns:repeat(4,1fr);gap:18px}
+}
+.sechead{margin-bottom:34px;max-width:70ch}
+.sechead .eb{display:block;margin-bottom:13px}
+.sechead p{margin:14px 0 0}
+
+/* ---------- nav ---------- */
+#nav{position:fixed;top:0;left:0;right:0;height:var(--nav);z-index:70;
+  background:rgba(0,0,0,.82);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+#nav .in{max-width:var(--max);margin:0 auto;padding:0 22px;height:100%;
+  display:flex;align-items:center;justify-content:space-between;gap:18px}
+.brand{display:flex;align-items:center;gap:9px;flex:none}
+.brand .mk{width:22px;height:22px;border:1.5px solid #fff;display:grid;place-items:center;flex:none}
+.brand .mk i{width:7px;height:7px;background:#fff;display:block}
+.brand b{font-family:var(--disp);font-weight:700;font-size:17px;letter-spacing:.14em;text-transform:uppercase}
+#navlinks{display:none;align-items:center;gap:4px}
+#navlinks a{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--faint);padding:9px 13px;border:1px solid transparent;transition:.16s}
+#navlinks a:hover{color:#fff;border-color:var(--line)}
+#navlinks a.on{color:#000;background:#fff;border-color:#fff}
+#burger{width:38px;height:38px;display:grid;place-items:center;border:1px solid var(--line);flex:none}
+#burger span{display:block;width:16px;height:1.5px;background:#fff;position:relative;transition:.2s}
+#burger span::before,#burger span::after{content:"";position:absolute;left:0;width:16px;height:1.5px;
+  background:#fff;transition:.2s}
+#burger span::before{top:-5px}#burger span::after{top:5px}
+#burger.x span{background:transparent}
+#burger.x span::before{top:0;transform:rotate(45deg)}
+#burger.x span::after{top:0;transform:rotate(-45deg)}
+#drawer{position:fixed;top:var(--nav);left:0;right:0;z-index:69;background:#000;
+  border-bottom:1px solid var(--line);transform:translateY(-104%);transition:transform .28s cubic-bezier(.2,.8,.2,1)}
+#drawer.on{transform:none}
+#drawer a{display:flex;align-items:center;justify-content:space-between;padding:16px 22px;
+  border-bottom:1px solid var(--line);font-family:var(--disp);font-weight:600;font-size:16px;
+  text-transform:uppercase;letter-spacing:.06em}
+#drawer a .eb{font-size:9px}
+@media(min-width:900px){#navlinks{display:flex}#burger{display:none}#drawer{display:none}}
+
+/* ---------- buttons ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:48px;padding:0 22px;
+  font-family:var(--mono);font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;
+  border:1px solid #fff;background:#fff;color:#000;transition:.16s;text-align:center;cursor:pointer}
+.btn:hover{background:#000;color:#fff}
+.btn.ghost{background:transparent;color:#fff;border-color:var(--line2)}
+.btn.ghost:hover{background:#fff;color:#000;border-color:#fff}
+.btn.blk{background:var(--panel2);color:#fff;border-color:var(--line)}
+.btn.blk:hover{background:#fff;color:#000;border-color:#fff}
+.btn.wide{width:100%}
+.btn.sm{min-height:38px;padding:0 15px;font-size:10px}
+.btn[disabled]{opacity:.3;pointer-events:none}
+.btns{display:flex;flex-wrap:wrap;gap:11px}
+
+/* ---------- cards ---------- */
+.card{background:var(--panel);border:1px solid var(--line);padding:20px;position:relative;transition:.18s}
+.card.hov:hover{border-color:var(--line3);background:var(--panel2)}
+.card+.card{margin-top:14px}
+.pad{padding:16px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.tag{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:9.5px;
+  letter-spacing:.16em;text-transform:uppercase;padding:5px 9px;border:1px solid var(--line);color:var(--faint)}
+.tag.ok{border-color:rgba(255,255,255,.5);color:#fff}
+.tag.warn{border-color:var(--line2);color:var(--dim)}
+.tag.bad{border-color:#fff;background:#fff;color:#000}
+.dot{width:6px;height:6px;background:currentColor;flex:none}
+.note{border:1px solid var(--line);border-left:2px solid #fff;background:var(--panel);
+  padding:13px 15px;font-size:13px;color:var(--dim);line-height:1.6}
+.note b{color:#fff;font-weight:600}
+.kv{display:flex;justify-content:space-between;gap:14px;padding:11px 0;border-bottom:1px solid var(--line);
+  font-size:13.5px}
+.kv:last-child{border-bottom:0}
+.kv span:first-child{color:var(--faint)}
+.kv span:last-child{font-family:var(--mono);font-size:12.5px}
+
+/* numbered step / feature card */
+.nc{background:var(--panel);border:1px solid var(--line);padding:22px 20px;transition:.18s}
+.nc:hover{border-color:var(--line3);background:var(--panel2)}
+.nc .n{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--faint);margin-bottom:16px}
+.nc h4{margin-bottom:9px}
+.nc p{margin:0;font-size:13.5px;color:var(--dim);line-height:1.6}
+
+/* ---------- forms ---------- */
+.fld{margin-bottom:15px}
+.fld label{display:block;margin-bottom:7px;font-family:var(--mono);font-size:10px;
+  letter-spacing:.2em;text-transform:uppercase;color:var(--faint)}
+.fld input,.fld select,.fld textarea{width:100%;background:var(--panel2);border:1px solid var(--line);
+  padding:13px 14px;font-size:14px;outline:none;transition:.16s;border-radius:0;color:#fff}
+.fld textarea{min-height:132px;resize:vertical;line-height:1.6}
+.fld input:focus,.fld select:focus,.fld textarea:focus{border-color:#fff;background:#000}
+.fld input::placeholder,.fld textarea::placeholder{color:rgba(255,255,255,.26)}
+.fld.bad input,.fld.bad textarea{border-color:#fff;background:rgba(255,255,255,.06)}
+.err{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  color:#fff;margin-top:6px;display:none}
+.fld.bad .err{display:block}
+select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,#fff 50%),
+  linear-gradient(135deg,#fff 50%,transparent 50%);
+  background-position:calc(100% - 18px) 50%,calc(100% - 13px) 50%;
+  background-size:5px 5px,5px 5px;background-repeat:no-repeat}
+
+/* ---------- toggles ---------- */
+.tog{flex:none;width:46px;height:24px;border:1px solid var(--line2);background:var(--panel2);
+  position:relative;transition:.18s;cursor:pointer}
+.tog::after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;background:var(--ghost);transition:.18s}
+.tog.on{background:#fff;border-color:#fff}
+.tog.on::after{left:24px;background:#000}
+.tog.dis{opacity:.3;pointer-events:none}
+.sw{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:15px 0;
+  border-bottom:1px solid var(--line)}
+.sw:last-child{border-bottom:0}
+.sw .lb{font-family:var(--disp);font-weight:600;font-size:14.5px;text-transform:uppercase;letter-spacing:.02em}
+.sw .sb{font-size:12.5px;color:var(--faint);margin-top:4px;line-height:1.55;max-width:52ch}
+.seg{display:flex;border:1px solid var(--line)}
+.seg button{flex:1;min-height:42px;font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--faint);border-right:1px solid var(--line);transition:.16s}
+.seg button:last-child{border-right:0}
+.seg button:hover{color:#fff}
+.seg button.on{background:#fff;color:#000}
+
+/* ================= HOME ================= */
+#hero{position:relative;min-height:calc(100vh - var(--nav));display:flex;align-items:flex-end;
+  padding-top:var(--nav);overflow:hidden;border-bottom:1px solid var(--line)}
+#heroMedia{position:absolute;inset:0;z-index:0;background:#000}
+#heroFallback{position:absolute;inset:0;width:100%;height:100%}
+#heroMedia::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(0,0,0,.72) 0%,rgba(0,0,0,.36) 34%,rgba(0,0,0,.9) 86%,#000 100%)}
+#heroBody{position:relative;z-index:2;width:100%;padding-bottom:clamp(46px,8vw,86px);padding-top:70px}
+#heroBody h1{margin:16px 0 0;max-width:15ch}
+#heroBody .lede{margin:20px 0 30px}
+.heroStats{display:flex;flex-wrap:wrap;gap:0;margin-top:38px;border-top:1px solid var(--line)}
+.heroStats div{flex:1;min-width:132px;padding:16px 18px 0 0;border-right:1px solid var(--line)}
+.heroStats div:last-child{border-right:0}
+.heroStats b{display:block;font-family:var(--disp);font-weight:700;font-size:clamp(21px,3vw,30px);
+  font-variant-numeric:tabular-nums;white-space:nowrap}
+.heroStats div>span{display:block;margin-top:3px}
+.heroStats b span{display:inline}
+
+/* founders */
+.fcard{background:var(--panel);border:1px solid var(--line);transition:.18s}
+.fcard:hover{border-color:var(--line3)}
+.fportrait{aspect-ratio:1;background:var(--panel2);border-bottom:1px solid var(--line);
+  position:relative;overflow:hidden;display:grid;place-items:center}
+.fportrait img{width:100%;height:100%;object-fit:cover;filter:grayscale(1)}
+.fportrait .init{font-family:var(--disp);font-weight:700;font-size:44px;color:rgba(255,255,255,.14);letter-spacing:.04em}
+.fportrait::after{content:"";position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,transparent 0 3px,rgba(255,255,255,.022) 3px 4px)}
+.fbody{padding:17px}
+.fbody h4{font-size:16px}
+.fbody .role{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--faint);margin-top:5px}
+.fbody p{margin:11px 0 0;font-size:13px;color:var(--dim);line-height:1.6}
+
+/* ================= APP SHELL ================= */
+#appwrap{padding-top:var(--nav)}
+#appwrap.act{padding-bottom:var(--tab)}
+.screen{display:none}
+.screen.on{display:block}
+.mast{padding:26px 0 20px;display:flex;align-items:flex-end;justify-content:space-between;gap:14px;
+  border-bottom:1px solid var(--line);margin-bottom:22px}
+.mast h2{margin-top:9px}
+.ions{flex:none;display:flex;align-items:center;gap:9px;border:1px solid var(--line);padding:9px 14px}
+.ions .cn{width:17px;height:17px;border:1.5px solid #fff;border-radius:50%;display:grid;place-items:center;
+  font-family:var(--mono);font-size:8px;flex:none}
+.ions b{font-family:var(--disp);font-weight:700;font-size:17px;font-variant-numeric:tabular-nums}
+
+/* hero trace */
+#hero2{position:relative;border:1px solid var(--line);background:var(--bg2);overflow:hidden}
+#trace{width:100%;height:210px}
+#sOver{position:absolute;left:18px;top:15px;pointer-events:none}
+#sVal{font-family:var(--disp);font-weight:700;font-size:58px;line-height:.88;font-variant-numeric:tabular-nums}
+#sTag{position:absolute;right:14px;top:14px}
+#clk{position:absolute;right:16px;bottom:12px;font-family:var(--mono);font-size:12px;color:var(--faint);
+  font-variant-numeric:tabular-nums}
+#calStrip{position:absolute;left:0;right:0;bottom:0;height:2px;background:rgba(255,255,255,.1)}
+#calStrip span{display:block;height:100%;background:#fff;width:0;transition:width .3s linear}
+/* signal quality strip, matters most for dry NeuroSky electrodes */
+#sig{position:absolute;left:18px;bottom:12px;display:flex;align-items:center;gap:8px}
+#sigBars{display:flex;gap:2px;align-items:flex-end;height:13px}
+#sigBars i{width:3px;background:var(--ghost);transition:.25s}
+#sigBars i.lit{background:#fff}
+#sigTxt{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+
+.bands{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);
+  border:1px solid var(--line);border-top:0}
+.bd{background:var(--panel);padding:12px 12px 13px}
+.bd .n{font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint)}
+.bd .v{font-family:var(--disp);font-weight:600;font-size:15px;margin:5px 0 8px;font-variant-numeric:tabular-nums}
+.bd .bar{height:2px;background:rgba(255,255,255,.1)}
+.bd .bar i{display:block;height:100%;background:#fff;width:0;transition:width .2s linear}
+
+/* source rows */
+.src{display:flex;gap:13px;align-items:flex-start;width:100%;text-align:left;padding:15px;
+  border:1px solid var(--line);margin-top:11px;background:var(--panel);transition:.16s;cursor:pointer}
+.src:hover{border-color:var(--line2)}
+.src.on{border-color:#fff;background:var(--panel2)}
+.src .rd{flex:none;width:15px;height:15px;border:1px solid var(--line2);margin-top:3px;position:relative}
+.src.on .rd{border-color:#fff}
+.src.on .rd::after{content:"";position:absolute;inset:3px;background:#fff}
+.src .nm{display:block;font-family:var(--disp);font-weight:600;font-size:14.5px;text-transform:uppercase;
+  letter-spacing:.03em}
+.src .ds{display:block;font-size:12.5px;color:var(--faint);line-height:1.55;margin-top:4px}
+.src .rec{display:inline-block;font-family:var(--mono);font-size:8.5px;letter-spacing:.16em;
+  border:1px solid var(--line2);padding:2px 6px;margin-left:8px;color:var(--dim);vertical-align:2px}
+
+/* chests */
+.chest{display:flex;gap:16px;align-items:center;width:100%;text-align:left;padding:16px;
+  border:1px solid var(--line);background:var(--panel);transition:.16s;cursor:pointer;margin-bottom:12px;
+  min-height:104px;box-sizing:border-box}
+.chest:hover{border-color:var(--line3);background:var(--panel2)}
+.chest .art{flex:none;width:60px;height:60px;border-radius:50%;display:grid;place-items:center}
+.chest .meta{flex:1;min-width:0}
+.chest .nm{display:block;font-family:var(--disp);font-weight:700;font-size:18px;text-transform:uppercase}
+.chest .sb{display:block;font-size:12px;color:var(--faint);margin-top:3px}
+.chest .od{display:inline-block;font-family:var(--mono);font-size:9px;letter-spacing:.14em;
+  border:1px solid var(--line);padding:3px 7px;margin-top:8px;color:var(--dim)}
+.chest .cost{flex:none;text-align:right;border-left:1px solid var(--line);padding-left:16px}
+.chest .cost b{display:block;font-family:var(--disp);font-weight:700;font-size:19px}
+.chest .cost small{display:block;font-family:var(--mono);font-size:8.5px;letter-spacing:.18em;color:var(--faint)}
+.chest.poor{opacity:.4}
+
+/* dex */
+.filt{display:flex;gap:8px;overflow-x:auto;padding-bottom:16px;scrollbar-width:none}
+.filt::-webkit-scrollbar{display:none}
+.chip{flex:none;padding:9px 14px;font-family:var(--mono);font-size:10px;letter-spacing:.16em;
+  text-transform:uppercase;border:1px solid var(--line);color:var(--faint);transition:.16s}
+.chip:hover{color:#fff;border-color:var(--line2)}
+.chip.on{background:#fff;color:#000;border-color:#fff}
+.dgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(min-width:620px){.dgrid{grid-template-columns:repeat(5,1fr)}}
+.cellc{position:relative;border:1px solid var(--line);background:var(--panel);padding:0;
+  text-align:left;transition:.16s;cursor:pointer;overflow:hidden}
+.cellc:hover{border-color:var(--line3)}
+.cellc .plate{position:relative;aspect-ratio:1;display:grid;place-items:center;overflow:hidden}
+.cellc svg{width:84%;height:84%}
+.cellc .cap{padding:9px 10px 10px;border-top:1px solid var(--line)}
+.cellc .nm{display:block;font-size:11px;font-weight:600;line-height:1.25;
+  overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+  min-height:28px}
+.cellc .tr{display:block;font-family:var(--mono);font-size:8px;letter-spacing:.18em;color:var(--faint);margin-top:4px}
+.cellc .ct{position:absolute;top:0;right:0;z-index:2;font-family:var(--mono);font-size:9px;
+  background:#fff;color:#000;padding:3px 6px}
+.cellc.lk .plate{background:var(--panel2)}
+.cellc.lk svg{opacity:.07;filter:grayscale(1) brightness(3)}
+.cellc.lk .nm{color:var(--ghost)}
+.myth{box-shadow:inset 0 0 0 1px rgba(255,192,46,.6),0 0 26px -6px rgba(255,192,46,.55)}
+
+/* reveal */
+#rev{position:fixed;inset:0;z-index:95;display:none;align-items:center;justify-content:center;
+  padding:22px;background:rgba(0,0,0,.96);overflow:hidden}
+#rev.on{display:flex}
+#rays{position:absolute;left:50%;top:42%;width:230vw;height:230vw;transform:translate(-50%,-50%);
+  opacity:0;transition:opacity .6s;pointer-events:none;
+  background:conic-gradient(from 0deg,transparent 0 9deg,rgba(255,255,255,.10) 9deg 18deg,transparent 18deg 27deg);
+  animation:spin 26s linear infinite}
+@keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
+#revBox{width:100%;max-width:370px;text-align:center;position:relative;z-index:2}
+.shaking{animation:shake .26s infinite}
+@keyframes shake{0%,100%{transform:translate(0) rotate(0)}
+ 25%{transform:translate(-4px,2px) rotate(-1.4deg)}50%{transform:translate(4px,-3px) rotate(1.4deg)}
+ 75%{transform:translate(-3px,-2px) rotate(-1deg)}}
+#revArt{position:relative;width:min(64vw,230px);aspect-ratio:1;margin:0 auto;border:1px solid var(--line2);
+  display:grid;place-items:center;overflow:hidden;background:var(--panel)}
+#revArt svg{width:80%;height:80%;position:relative;z-index:2}
+#revArt .pl{position:absolute;inset:0;z-index:0}
+#revMeta{margin-top:22px;opacity:0;transform:translateY(10px);transition:opacity .4s,transform .4s}
+#revMeta.in{opacity:1;transform:none}
+#revRar{font-family:var(--mono);font-size:10.5px;letter-spacing:.3em;text-transform:uppercase}
+#revName{font-family:var(--disp);font-weight:700;font-size:29px;text-transform:uppercase;margin:9px 0 0;line-height:1.06}
+#revNew{display:inline-block;margin-top:11px;font-family:var(--mono);font-size:9px;letter-spacing:.22em;
+  padding:5px 11px;background:#fff;color:#000}
+#revFact{font-size:13px;color:var(--dim);margin:14px 0 0;line-height:1.6}
+#revDup{margin-top:12px;font-family:var(--mono);font-size:11.5px;letter-spacing:.1em}
+#revBtns{margin-top:24px;display:flex;gap:10px}
+#revBtns .btn{flex:1}
+.burst{position:absolute;left:50%;top:42%;width:5px;height:5px;background:#fff;pointer-events:none;z-index:1}
+
+/* sheet */
+#sheet{position:fixed;inset:0;z-index:90;display:none}
+#sheet.on{display:block}
+#shBg{position:absolute;inset:0;background:rgba(0,0,0,.8)}
+#shBody{position:absolute;left:0;right:0;bottom:0;background:#000;border-top:1px solid var(--line2);
+  padding:20px 20px calc(24px + env(safe-area-inset-bottom));max-height:90vh;overflow-y:auto;
+  transform:translateY(100%);transition:transform .3s cubic-bezier(.2,.85,.2,1)}
+@media(min-width:700px){#shBody{left:50%;right:auto;bottom:auto;top:50%;width:min(520px,92vw);
+  transform:translate(-50%,-46%) scale(.97);opacity:0;border:1px solid var(--line2);max-height:86vh}
+  #sheet.in #shBody{transform:translate(-50%,-50%);opacity:1}}
+#sheet.in #shBody{transform:translateY(0)}
+@media(min-width:700px){#sheet.in #shBody{transform:translate(-50%,-50%)}}
+#grab{width:34px;height:2px;background:var(--line2);margin:0 auto 18px}
+@media(min-width:700px){#grab{display:none}}
+
+/* stats */
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+@media(min-width:620px){.kpis{grid-template-columns:repeat(4,1fr)}}
+.kpi{background:var(--panel);padding:17px}
+.kpi .v{font-family:var(--disp);font-weight:700;font-size:27px;margin-top:7px;font-variant-numeric:tabular-nums}
+#hist{width:100%;height:120px;margin-top:12px}
+.prg{margin-top:15px}
+.prg .pl{display:flex;justify-content:space-between;margin-bottom:7px;font-size:13px}
+.prg .pl b{font-family:var(--mono);font-size:12px;font-weight:400;color:var(--faint)}
+.prg .pb{height:3px;background:rgba(255,255,255,.09)}
+.prg .pb i{display:block;height:100%;background:#fff}
+table.tb{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:11.5px;margin-top:12px;
+  font-variant-numeric:tabular-nums}
+table.tb th,table.tb td{text-align:right;padding:9px 4px;border-bottom:1px solid var(--line)}
+table.tb th:first-child,table.tb td:first-child{text-align:left}
+table.tb th{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);font-weight:400}
+table.tb tr:last-child td{border-bottom:0}
+
+/* app tab bar */
+#tabs{position:fixed;left:0;right:0;bottom:0;z-index:60;display:none;
+  grid-template-columns:repeat(4,1fr);background:rgba(0,0,0,.94);backdrop-filter:blur(14px);
+  border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+#tabs.on{display:grid}
+#tabs button{padding:11px 0 10px;display:flex;flex-direction:column;align-items:center;gap:5px;
+  color:var(--faint);border-right:1px solid var(--line);transition:.16s}
+#tabs button:last-child{border-right:0}
+#tabs button svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.6;
+  stroke-linecap:round;stroke-linejoin:round}
+#tabs button span{font-family:var(--mono);font-size:8.5px;letter-spacing:.16em;text-transform:uppercase}
+#tabs button.on{color:#fff;background:rgba(255,255,255,.05)}
+
+#toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,14px);z-index:99;background:#fff;
+  color:#000;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  padding:12px 18px;opacity:0;transition:.22s;pointer-events:none;max-width:88vw;text-align:center}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+
+/* models page */
+.mrow{border:1px solid var(--line);background:var(--panel);padding:19px;margin-bottom:12px;transition:.16s}
+.mrow:hover{border-color:var(--line2)}
+.mrow .top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.mrow h4{font-size:15.5px}
+.mrow .id{font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;color:var(--faint);margin-bottom:9px}
+.mrow p{margin:11px 0 0;font-size:13.5px;color:var(--dim);line-height:1.62;max-width:66ch}
+.mstat{display:flex;gap:22px;margin-top:15px;padding-top:14px;border-top:1px solid var(--line)}
+.mstat div span{display:block;font-family:var(--mono);font-size:9px;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--faint)}
+.mstat div b{display:block;font-family:var(--disp);font-weight:600;font-size:17px;margin-top:4px;
+  font-variant-numeric:tabular-nums}
+
+/* research placeholder */
+.holo{border:1px dashed var(--line2);padding:clamp(34px,6vw,64px) 26px;text-align:center;background:var(--panel)}
+.holo .eb{margin-bottom:16px}
+
+/* footer */
+#foot{border-top:1px solid var(--line);padding:44px 0 34px;margin-top:0;position:relative;z-index:1}
+#foot .cols{display:grid;grid-template-columns:1fr;gap:28px}
+@media(min-width:760px){#foot .cols{grid-template-columns:2fr 1fr 1fr 1fr}}
+#foot h5{font-family:var(--mono);font-size:9.5px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--faint);margin:0 0 14px;font-weight:400}
+#foot a{display:block;font-size:13px;color:var(--dim);padding:5px 0;transition:.14s}
+#foot a:hover{color:#fff}
+#foot .btm{margin-top:34px;padding-top:20px;border-top:1px solid var(--line);
+  display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;font-size:11.5px;color:var(--faint)}
+
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+body.norm *{animation:none!important}
+</style>
+</head>
+<body>
+
+<nav id="nav"><div class="in">
+  <a class="brand" href="#/home"><span class="mk"><i></i></span><b>NeuroDex</b></a>
+  <div id="navlinks">
+    <a href="#/home" data-r="home">Home</a>
+    <a href="#/app" data-r="app">Train</a>
+    <a href="#/models" data-r="models">Models</a>
+    <a href="#/research" data-r="research">Research</a>
+    <a href="#/contact" data-r="contact">Contact</a>
+  </div>
+  <button id="burger" aria-label="Menu"><span></span></button>
+</div></nav>
+<div id="drawer">
+  <a href="#/home" data-r="home">Home <span class="eb">01</span></a>
+  <a href="#/app" data-r="app">Train <span class="eb">02</span></a>
+  <a href="#/models" data-r="models">Models <span class="eb">03</span></a>
+  <a href="#/research" data-r="research">Research <span class="eb">04</span></a>
+  <a href="#/contact" data-r="contact">Contact <span class="eb">05</span></a>
+</div>
+
+<!-- ==================== HOME ==================== -->
+<div class="page" id="page-home">
+  <header id="hero">
+    <div id="heroMedia">
+      <canvas id="heroFallback"></canvas>
+    </div>
+    <div class="wrap" id="heroBody">
+      <div class="eb on">A thalamocortical dysrhythmia pilot</div>
+      <h1 class="h-xl">One glitch.<br>Three symptoms.<br>One EEG.</h1>
+      <p class="lede">Chronic pain, tinnitus, and depression are usually treated as unrelated problems.
+        A theory called thalamocortical dysrhythmia says they might not be: a small circuit in the
+        thalamus can get stuck pulsing slowly instead of quickly, and depending on which part of the
+        brain that circuit feeds, the same glitch can show up as pain, ringing in the ears, or low mood.
+        NeuroDex measures that glitch directly off your own EEG, compares it to your own resting brain,
+        and trains you against it &mdash; delivered as a neurofeedback game so a five-minute session
+        is something you'll actually want to run twice a day.</p>
+      <div class="btns">
+        <a class="btn" href="#/app">Start a session</a>
+        <a class="btn ghost" href="#/research">Read the pilot design</a>
+      </div>
+      <div class="heroStats">
+        <div><b>3</b><span class="eb">Conditions, one theory</span></div>
+        <div><b>2</b><span class="eb">Bands compared: &theta; vs &gamma;</span></div>
+        <div><b>512<span style="font-size:.58em">&#8202;Hz</span></b><span class="eb">Raw EEG, not a summary</span></div>
+        <div><b>1</b><span class="eb">Baseline: yours</span></div>
+      </div>
+    </div>
+  </header>
+
+  <section class="sec">
+    <div class="wrap">
+      <div class="sechead">
+        <span class="eb">01 — The brain's metronome</span>
+        <h2 class="h-lg">Your brain runs on rhythms, and speed means something</h2>
+        <p class="lede">Neurons don't just fire, they fire in coordinated waves, and different speeds
+          of wave show up during different kinds of mental work. Slow waves, called <b>theta</b>
+          (about 4&ndash;8 cycles per second), dominate when the brain is idling &mdash; drowsy, unfocused,
+          drifting. Fast waves, called <b>beta</b> and <b>gamma</b> (roughly 13&ndash;100 cycles per
+          second), dominate during normal alert processing, when a brain region is actually doing its
+          job. A healthy thalamus and cortex trade off between these speeds constantly, all day, without
+          you ever noticing.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="wrap">
+      <div class="sechead">
+        <span class="eb">02 — When the metronome gets stuck</span>
+        <h2 class="h-lg">Thalamocortical dysrhythmia: one circuit, stuck slow</h2>
+        <p class="lede">The thalamus is a relay station: almost everything you see, hear, and feel
+          passes through it on the way to the cortex, and it normally relays that information using
+          fast rhythms. The dysrhythmia theory, first proposed by neuroscientist Rodolfo Llin&aacute;s
+          and colleagues in the late 1990s, says that in some people a specific thalamic circuit gets
+          stuck firing in slow theta instead &mdash; and that this slow rhythm then leaks into whatever
+          cortical area that circuit feeds, dragging normal fast processing down with it. The cortex on
+          the receiving end doesn't stop working; it just starts working wrong.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="wrap">
+      <div class="sechead">
+        <span class="eb">03 — Why one glitch looks like three diseases</span>
+        <h2 class="h-lg">Same problem, different address</h2>
+        <p class="lede">What the leaking theta rhythm actually feels like depends entirely on which
+          cortical neighborhood it lands in &mdash; the mechanism is identical, only the zip code
+          changes.</p>
+      </div>
+      <div class="grid3">
+        <div class="nc"><div class="n">01</div><h4 class="h-sm">Auditory cortex &rarr; tinnitus</h4>
+          <p>The circuit that should carry sound information runs slow, and the brain reads that
+            distorted, theta-heavy pattern as a phantom tone that isn't actually there.</p></div>
+        <div class="nc"><div class="n">02</div><h4 class="h-sm">Somatosensory cortex &rarr; pain</h4>
+          <p>The circuit that should carry touch and body-position information runs slow instead,
+            and ordinary or absent input gets misread as pain.</p></div>
+        <div class="nc"><div class="n">03</div><h4 class="h-sm">Prefrontal / limbic &rarr; depression</h4>
+          <p>The circuits behind mood regulation and executive function run slow, and the result looks
+            less like a single symptom and more like a persistent low mood.</p></div>
+      </div>
+      <p class="lede" style="margin-top:26px">This is a genuinely useful idea specifically because it's
+        testable: it predicts one measurable EEG signature, not three separate ones, and today it's a
+        respected but still-debated framework, not settled fact. That's exactly what makes it worth
+        checking on a real brain instead of just reading about.</p>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <section class="sec">
+    <div class="wrap">
+      <div class="sechead">
+        <span class="eb">04 — What the headset actually measures</span>
+        <h2 class="h-lg">Two numbers, both derived from the same raw wave</h2>
+        <p class="lede">A NeuroSky headset streams your raw EEG at 512 samples per second. NeuroDex
+          slices that stream into short windows and runs each one through an FFT (fast Fourier
+          transform) &mdash; a standard way of taking a wiggly signal and asking "how much of this is
+          slow, and how much is fast?" That breakdown produces two numbers worth knowing:</p>
+      </div>
+      <div class="grid3">
+        <div class="nc"><div class="n">&theta;/&gamma;</div><h4 class="h-sm">The ratio</h4>
+          <p>How much slow theta power is present compared to fast beta and gamma power. High theta
+            relative to gamma is the pattern the dysrhythmia theory predicts; more gamma relative to
+            theta is the normal, fast-dominant pattern. This is what the Focus Index in the app is
+            built from.</p></div>
+        <div class="nc"><div class="n">SEF95</div><h4 class="h-sm">Spectral edge frequency</h4>
+          <p>The frequency below which 95% of your brain's power sits. Think of it as "where the center
+            of gravity of your brain activity is." A healthy, fast-dominant brain has a higher edge
+            frequency; a theta-heavy one sits lower.</p></div>
+        <div class="nc"><div class="n">4&times;/s</div><h4 class="h-sm">Update rate</h4>
+          <p>Both numbers get recomputed about four times a second while you sit with the headset on,
+            which is fast enough to give you feedback in something close to real time, not just a
+            score at the end.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <section class="sec">
+    <div class="wrap">
+      <div class="sechead">
+        <span class="eb">05 — Measured against you, not a chart</span>
+        <h2 class="h-lg">There's no "normal" number to hit</h2>
+        <p class="lede">The dysrhythmia signature isn't a fixed number that applies to everyone; a
+          resting theta/gamma ratio varies a lot from person to person even with nothing wrong. So the
+          first minute of every session is spent quietly measuring <i>you</i>: your own resting theta,
+          alpha, beta and gamma levels, with no expectation attached. Every score after that is a
+          z-score against that personal baseline &mdash; a measure of how far you've moved from your
+          own resting rhythm, not from someone else's. A good session means good for you.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="wrap">
+      <div class="sechead">
+        <span class="eb">06 — Keeping the signal honest</span>
+        <h2 class="h-lg">A blink is not a brainwave</h2>
+        <p class="lede">A single dry electrode on your forehead doesn't just pick up cortical rhythm
+          &mdash; a single blink swings the signal harder than any real EEG activity does, and a jaw
+          clench can bury the whole spectrum under muscle noise. Left alone, either one would fake the
+          exact pattern this project is trying to measure. Six filters run on every window before it
+          reaches your score, and the same recording can optionally be re-checked offline through
+          <a href="https://mne.tools" target="_blank" rel="noopener" style="color:#fff;text-decoration:underline">MNE-Python</a>,
+          a research-grade EEG toolkit, as an independent second opinion. See exactly how on the
+          <a href="#/models" style="color:#fff;text-decoration:underline">Models</a> tab.</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <section class="sec">
+    <div class="wrap">
+      <div class="sechead">
+        <span class="eb">07 — How the training loop works</span>
+        <h2 class="h-lg">Neurofeedback, delivered as a game</h2>
+        <p class="lede">The training half is simple: every few seconds NeuroDex tells you, through
+          sound or a visual cue, whether your ratio is drifting toward the fast, non-dysrhythmic side
+          or the slow, theta-heavy side. Over repeated sessions that feedback is what lets the brain
+          practice nudging its own rhythm &mdash; the same principle behind clinical neurofeedback
+          therapy, just aimed at this specific ratio instead of generic relaxation. Sitting still and
+          watching a number for five minutes twice a day is a hard habit to keep, so we deliver that
+          loop as a lightweight collection game &mdash; you earn Ions for time spent on the target side
+          of the ratio, and spend them on a 51-specimen neuroscience collection. The game is just the
+          delivery mechanism; the number underneath it is the actual project.</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <section class="sec">
+    <div class="wrap grid2">
+      <div>
+        <span class="eb">08 — Hardware</span>
+        <h2 class="h-lg" style="margin-top:13px">Built for NeuroSky</h2>
+        <p class="lede" style="margin-top:16px">NeuroDex is tuned end to end for the NeuroSky
+          ThinkGear chipset: MindWave, MindWave Mobile and MindWave Mobile 2. We read the raw 512 Hz
+          wave rather than trusting the on-chip attention number, but we use the chip's own contact
+          quality and blink detection to throw out the samples that would otherwise poison your score.</p>
+        <div class="btns" style="margin-top:26px">
+          <a class="btn ghost" href="#/models">How the filters work</a>
+        </div>
+      </div>
+      <div class="card">
+        <div class="eb" style="margin-bottom:6px">ThinkGear support matrix</div>
+        <div class="kv"><span>Raw wave (0x80)</span><span>512 Hz · used for scoring</span></div>
+        <div class="kv"><span>ASIC band power (0x83)</span><span>8 bands · fallback</span></div>
+        <div class="kv"><span>Poor signal (0x02)</span><span>Contact gate</span></div>
+        <div class="kv"><span>Blink strength (0x16)</span><span>Artifact reject</span></div>
+        <div class="kv"><span>Attention (0x04)</span><span>Logged, not scored</span></div>
+        <div class="kv"><span>Meditation (0x05)</span><span>Logged, not scored</span></div>
+        <div class="note" style="margin-top:18px">MindWave Mobile pairs over Bluetooth <b>Classic</b>,
+          which browsers cannot open directly. The included Python bridge handles the serial link and
+          forwards it to the app over your network.</div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <section class="sec">
+    <div class="wrap">
+      <div class="sechead">
+        <span class="eb">09 — Team</span>
+        <h2 class="h-lg">Founders</h2>
+        <p class="lede">Replace these placeholders with your own names, roles and photos. Drop portrait
+          images beside the page and point each card at them.</p>
+      </div>
+      <div class="grid4" id="founders"></div>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <section class="sec tight">
+    <div class="wrap" style="text-align:center">
+      <h2 class="h-lg">Put the headset on</h2>
+      <p class="lede" style="margin:16px auto 28px">Practice mode runs the whole loop with no hardware
+        at all, so you can see where this goes before you plug anything in.</p>
+      <div class="btns" style="justify-content:center">
+        <a class="btn" href="#/app">Open the app</a>
+        <a class="btn ghost" href="#/contact">Talk to us</a>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ==================== APP ==================== -->
+<div class="page hidden" id="page-app"><div id="appwrap"><div class="wrap">
+
+  <section class="screen on" id="s-session">
+    <div class="mast">
+      <div><span class="eb">Theta vs. beta+gamma, against your own baseline</span><h2 class="h-md">Session</h2></div>
+      <div class="ions"><span class="cn">i</span><b class="num" id="ionA">0</b></div>
+    </div>
+    <div id="hero2">
+      <canvas id="trace"></canvas>
+      <div id="sOver"><div id="sVal">--</div><div class="eb" id="sLab" style="margin-top:5px">Focus index</div></div>
+      <div id="sTag" class="tag">Idle</div>
+      <div id="clk">0:00</div>
+      <div id="sig"><div id="sigBars"></div><div id="sigTxt">No link</div></div>
+      <div id="calStrip"><span></span></div>
+    </div>
+    <div class="bands" id="bands"></div>
+
+    <div class="card" style="margin-top:20px">
+      <div class="eb" style="margin-bottom:12px">Session length</div>
+      <div class="seg" id="durSeg">
+        <button data-min="3" class="on">3 min</button>
+        <button data-min="5">5 min</button>
+        <button data-min="10">10 min</button>
+      </div>
+      <div class="btns" style="margin-top:14px">
+        <button class="btn wide" id="startBtn">Start session</button>
+        <button class="btn ghost hidden" id="stopBtn" style="min-width:110px">Stop</button>
+      </div>
+      <div class="note hidden" id="needSrc" style="margin-top:14px">
+        Pick a signal source below first. <b>Practice mode</b> needs no hardware.</div>
+    </div>
+
+    <div class="card">
+      <div class="row" style="margin-bottom:4px">
+        <div class="eb">Signal source</div>
+        <span class="tag" id="srcState">Not connected</span>
+      </div>
+      <div id="srcList"></div>
+      <div id="srcCfg"></div>
+      <div class="btns" style="margin-top:15px">
+        <button class="btn blk wide" id="connBtn">Connect</button>
+        <button class="btn ghost hidden" id="discBtn" style="min-width:110px">Drop</button>
+      </div>
+    </div>
+
+    <div class="card hidden" id="sumCard">
+      <span class="eb on">Session complete</span>
+      <h3 class="h-md" style="margin:9px 0 16px" id="sumT">Summary</h3>
+      <canvas id="sumC" style="width:100%;height:96px"></canvas>
+      <div class="kpis" style="margin-top:16px">
+        <div class="kpi"><div class="eb">Mean focus</div><div class="v num" id="sumAvg">0</div></div>
+        <div class="kpi"><div class="eb">Time in band</div><div class="v num" id="sumBand">0%</div></div>
+      </div>
+      <div class="row" style="margin-top:18px;padding-top:16px;border-top:1px solid var(--line)">
+        <div><div class="eb">Ions earned</div>
+          <div class="num" style="font-family:var(--disp);font-weight:700;font-size:27px;margin-top:5px" id="sumIons">+0</div></div>
+        <button class="btn sm" id="toChests">Open chests</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="screen" id="s-chests">
+    <div class="mast">
+      <div><span class="eb">Specimen acquisition</span><h2 class="h-md">Chests</h2></div>
+      <div class="ions"><span class="cn">i</span><b class="num" id="ionB">0</b></div>
+    </div>
+    <div id="cgrid"></div>
+    <div class="card">
+      <div class="eb">Duplicate refund</div>
+      <p class="dim" style="font-size:13px;margin:9px 0 0">Pull something you already own and it
+        converts straight back to Ions.</p>
+      <table class="tb" id="dupTb"></table>
+    </div>
+  </section>
+
+  <section class="screen" id="s-dex">
+    <div class="mast">
+      <div><span class="eb">Collection</span><h2 class="h-md">Dex</h2></div>
+      <div class="ions"><span class="cn">%</span><b class="num" id="dexN">0/51</b></div>
+    </div>
+    <div class="filt" id="filt"></div>
+    <div class="dgrid" id="dgrid"></div>
+  </section>
+
+  <section class="screen" id="s-stats">
+    <div class="mast">
+      <div><span class="eb">Training record</span><h2 class="h-md">Progress</h2></div>
+    </div>
+    <div class="kpis">
+      <div class="kpi"><div class="eb">Day streak</div><div class="v num" id="kStreak">0</div></div>
+      <div class="kpi"><div class="eb">Time trained</div><div class="v num" id="kTime">0m</div></div>
+      <div class="kpi"><div class="eb">Sessions</div><div class="v num" id="kSess">0</div></div>
+      <div class="kpi"><div class="eb">Mean focus</div><div class="v num" id="kAvg">--</div></div>
+    </div>
+    <div class="card" style="margin-top:14px">
+      <div class="eb">Mean focus by session</div>
+      <canvas id="hist"></canvas>
+      <div class="row" style="margin-top:6px">
+        <div class="eb" id="histNote">No sessions yet</div>
+        <div style="display:flex;gap:14px">
+          <span class="eb" style="display:flex;align-items:center;gap:6px">
+            <i style="width:7px;height:7px;background:#fff;display:inline-block"></i>Hit target</span>
+          <span class="eb" style="display:flex;align-items:center;gap:6px">
+            <i style="width:7px;height:7px;background:rgba(255,255,255,.3);display:inline-block"></i>Below</span>
+        </div>
+      </div>
+    </div>
+    <div class="card" id="mneCard">
+      <div class="row"><div class="eb">MNE artifact audit</div><span class="tag" id="mneState">No raw capture</span></div>
+      <p class="dim" style="font-size:13px;margin:9px 0 0">Turn on <b>Record raw for MNE audit</b> below,
+        then run one session. This checks that recording, offline, against
+        <a href="https://mne.tools" target="_blank" rel="noopener" style="color:#fff;text-decoration:underline">MNE-Python's</a>
+        published muscle-artifact and amplitude-artifact detectors &mdash; an independent read on how
+        much the live in-browser filters agree with a research-grade pipeline.</p>
+      <div class="btns" style="margin-top:14px">
+        <button class="btn ghost sm" id="mneDl" style="flex:1">Download raw (last session)</button>
+        <button class="btn blk sm" id="mneRun" style="flex:1">Analyze with MNE</button>
+      </div>
+      <div id="mneOut" style="margin-top:14px"></div>
+    </div>
+    <div class="card"><div class="eb">Collection by chest</div><div id="prgList"></div></div>
+    <div class="card">
+      <div class="eb">Drop rates</div>
+      <p class="dim" style="font-size:13px;margin:9px 0 0">Every roll is independent and uses exactly
+        these rates. No pity timer, no streak weighting.</p>
+      <table class="tb" id="oddsTb"></table>
+    </div>
+    <div class="card"><div class="eb">Settings</div><div id="setList"></div></div>
+    <div class="card">
+      <div class="eb">Data</div>
+      <div class="btns" style="margin-top:14px">
+        <button class="btn ghost sm" id="expBtn" style="flex:1">Export save</button>
+        <button class="btn ghost sm" id="rstBtn" style="flex:1">Reset all</button>
+      </div>
+    </div>
+  </section>
+
+</div></div></div>
+
+<!-- ==================== MODELS ==================== -->
+<div class="page hidden" id="page-models"><div class="wrap" style="padding-top:calc(var(--nav) + 46px);padding-bottom:70px">
+  <div class="sechead">
+    <span class="eb">03 — Models</span>
+    <h1 class="h-lg">Artifact filters</h1>
+    <p class="lede">A single dry forehead electrode picks up far more than thalamocortical rhythm: a
+      blink swings the signal harder than any real EEG activity, a jaw clench buries the whole spectrum
+      under muscle noise, and a loose headband reports pure junk. Any of that leaking into the theta or
+      gamma bins would fake the exact signature this project is trying to measure, so every filter below
+      runs live on the window before it ever reaches the Focus Index or the phenotyping ratio. Toggle one
+      off and watch the reject count change.</p>
+    <p class="lede" style="margin-top:14px">These six run in the browser, in real time, on a budget of
+      milliseconds &mdash; they're fast heuristics, not a diagnostic pipeline. For a slower, independent
+      check, exported sessions can also be run back through an <a href="https://mne.tools" target="_blank" rel="noopener" style="color:#fff;text-decoration:underline">MNE-Python</a>
+      artifact pass offline (see the Progress tab), which flags muscle and amplitude artifacts using the
+      same published methods researchers use on clinical EEG, so you can see how often the live filters
+      agree with it.</p>
+  </div>
+  <div class="row" style="margin-bottom:18px;flex-wrap:wrap">
+    <div class="eb">Live pipeline counters</div>
+    <div class="btns"><button class="btn ghost sm" id="fReset">Reset counters</button>
+      <button class="btn ghost sm" id="fDefaults">Restore defaults</button></div>
+  </div>
+  <div id="modelList"></div>
+  <div class="card" style="margin-top:22px">
+    <div class="eb" style="margin-bottom:12px">Window disposition</div>
+    <div class="kpis">
+      <div class="kpi"><div class="eb">Accepted</div><div class="v num" id="fAcc">0</div></div>
+      <div class="kpi"><div class="eb">Rejected</div><div class="v num" id="fRej">0</div></div>
+      <div class="kpi"><div class="eb">Reject rate</div><div class="v num" id="fRate">0%</div></div>
+      <div class="kpi"><div class="eb">Filters on</div><div class="v num" id="fOn">0/6</div></div>
+    </div>
+    <p class="dim" style="font-size:13px;margin:16px 0 0">A rejected window is dropped, not
+      interpolated. Your focus index simply holds its last value instead of being dragged by an
+      artifact. Sustained reject rates above roughly 30% usually mean the headset needs reseating
+      rather than that the filters are too aggressive.</p>
+  </div>
+</div></div>
+
+<!-- ==================== RESEARCH ==================== -->
+<div class="page hidden" id="page-research"><div class="wrap" style="padding-top:calc(var(--nav) + 46px);padding-bottom:70px">
+  <div class="sechead">
+    <span class="eb">04 — Research</span>
+    <h1 class="h-lg">Research</h1>
+    <p class="lede">Study protocols, datasets and write-ups live here as they're ready. First entry below.</p>
+  </div>
+
+  <div class="card" style="margin-bottom:28px">
+    <div class="row" style="align-items:flex-start;flex-wrap:wrap;gap:14px">
+      <div>
+        <span class="eb on">Pilot 001 &middot; Design stage</span>
+        <h2 class="h-lg" style="margin-top:12px;max-width:22ch">Thalamocortical dysrhythmia: a personal phenotyping pilot</h2>
+      </div>
+      <span class="tag warn">n = 1, not diagnostic</span>
+    </div>
+    <p class="lede" style="margin-top:18px">
+      Chronic tinnitus, chronic pain and depression are treated as unrelated conditions, but one
+      theory says a subset of each shares a mechanism: thalamic circuits that should idle in a fast
+      rhythm get stuck oscillating in theta instead, and that slow rhythm leaks into whichever cortical
+      region the affected thalamic loop feeds. The symptom just depends on the target &mdash; auditory
+      cortex gives tinnitus, somatosensory cortex gives pain, prefrontal and limbic circuits give
+      depression. This pilot asks a narrower, answerable question: does a consumer EEG headset pick up
+      that signature at all, and does training against it move the number.
+    </p>
+
+    <div class="hr" style="margin:26px 0"></div>
+
+    <h3 class="h-sm">The theory, briefly</h3>
+    <p style="font-size:13.5px;color:var(--dim);line-height:1.7;margin:12px 0 0;max-width:68ch">
+      Rodolfo Ll&iacute;nas proposed thalamocortical dysrhythmia in 1999: certain thalamic nuclei
+      normally fire in a fast rhythm and switch to slow theta-range bursting under conditions like
+      deafferentation or disrupted input. That theta bleeds into the cortical target the nucleus
+      projects to, and surrounding cortex reacts with abnormally high-frequency activity at the edges
+      of the affected zone &mdash; a halo of gamma around a core of theta. The theory is still debated;
+      it is not settled neuroscience, and this pilot treats it as a hypothesis worth checking against
+      real data, not a diagnosis to apply to anyone.
+    </p>
+
+    <h3 class="h-sm" style="margin-top:26px">The two metrics</h3>
+    <div class="kv"><span>Spectral edge frequency (SEF95)</span>
+      <span>Frequency below which 95% of spectral power sits</span></div>
+    <div class="kv"><span>Low/high power ratio</span>
+      <span>(theta + delta) &divide; (alpha + beta + gamma)</span></div>
+    <p style="font-size:13.5px;color:var(--dim);line-height:1.7;margin:14px 0 0;max-width:68ch">
+      A depressed SEF95 and an elevated low/high ratio, held at rest over many baseline sessions, is
+      the signature the theory predicts. Neither number is exotic &mdash; SEF95 is standard in
+      anaesthesia depth monitoring, and the ratio is a simple reweighting of the same four band powers
+      the app already computes four times a second.
+    </p>
+
+    <h3 class="h-sm" style="margin-top:26px">Where it sits in the existing pipeline</h3>
+    <p style="font-size:13.5px;color:var(--dim);line-height:1.7;margin:12px 0 0;max-width:68ch">
+      No new signal-acquisition path is needed. <a href="#/models" style="color:#fff;text-decoration:underline">The FFT and artifact filters</a>
+      already built for the Focus Index run on the same window, so both metrics are a second read of
+      output that already exists: SEF95 from the cumulative power curve across the same frequency bins,
+      the ratio from the same four band powers. The <a href="#/app" style="color:#fff;text-decoration:underline">session log on Progress</a>
+      already stores a mean per session &mdash; phenotyping is a question of trend across many of those,
+      not a new logging system.
+    </p>
+
+    <h3 class="h-sm" style="margin-top:26px">The intervention</h3>
+    <p style="font-size:13.5px;color:var(--dim);line-height:1.7;margin:12px 0 0;max-width:68ch">
+      Closed-loop neurofeedback that rewards higher-frequency activity and suppresses the intruding
+      theta is, mechanically, the training loop already running on the Session screen. The Focus Index
+      is one way to read the same band powers; a TBR-based score that explicitly rewards
+      (alpha+beta+gamma) over theta is another read of identical data. The pilot's second question is
+      whether repeated sessions measurably shift that ratio over time, the same way any other trained
+      signal might drift with practice.
+    </p>
+
+    <div class="note" style="margin-top:26px">
+      <b>What this does not show.</b> One EEG channel at the forehead cannot localize activity to a
+      specific cortical region the way the original theory's imaging studies could &mdash; there is no
+      way to separate "auditory cortex" from "somatosensory cortex" with a single dry electrode. This
+      pilot can only ask whether a resting frontal signature exists and whether it moves with training,
+      not which downstream symptom it maps to. Treat every result here as exploratory self-experimentation.
+    </div>
+
+    <h3 class="h-sm" style="margin-top:28px">Protocol</h3>
+    <div class="grid3" style="margin-top:14px">
+      <div class="nc"><div class="n">01</div><h4 class="h-sm">Baseline phenotype</h4>
+        <p>10&ndash;15 resting sessions, no feedback shown, to get a stable SEF95 and low/high ratio
+          and see how much they vary day to day before any training starts.</p></div>
+      <div class="nc"><div class="n">02</div><h4 class="h-sm">Compare to the model</h4>
+        <p>Check whether the resting numbers actually sit where the dysrhythmia model predicts, or
+          just reflect normal individual variation. Most people will not show a clean signature.</p></div>
+      <div class="nc"><div class="n">03</div><h4 class="h-sm">Closed-loop training</h4>
+        <p>N sessions of feedback tuned to reward the high-frequency side of the ratio, using the
+          same session structure as normal training, just rescored.</p></div>
+      <div class="nc"><div class="n">04</div><h4 class="h-sm">Re-phenotype</h4>
+        <p>Repeat the resting measurement and check whether the ratio moved outside day-to-day
+          noise, and whether it holds a week after training stops.</p></div>
+    </div>
+  </div>
+
+  <div class="sechead">
+    <span class="eb">More in this track</span>
+  </div>
+  <div class="grid3" id="researchGrid"></div>
+</div></div>
+
+<!-- ==================== CONTACT ==================== -->
+<div class="page hidden" id="page-contact"><div class="wrap" style="padding-top:calc(var(--nav) + 46px);padding-bottom:70px">
+  <div class="sechead">
+    <span class="eb">05 — Contact</span>
+    <h1 class="h-lg">Get in touch</h1>
+    <p class="lede">Hardware questions, research collaboration, or a bug in the app. Tell us which and
+      we'll route it properly.</p>
+  </div>
+  <div class="grid2">
+    <div>
+      <form id="cForm" name="contact" method="POST" novalidate>
+        <p class="hidden"><label>Skip this<input name="botfield"></label></p>
+        <div class="fld" id="f-name">
+          <label for="cName">Name</label>
+          <input id="cName" name="name" type="text" placeholder="Your name" autocomplete="name">
+          <div class="err">Please enter your name</div>
+        </div>
+        <div class="fld" id="f-email">
+          <label for="cEmail">Email</label>
+          <input id="cEmail" name="email" type="email" placeholder="you@domain.com" autocomplete="email">
+          <div class="err">Please enter a valid email address</div>
+        </div>
+        <div class="fld" id="f-topic">
+          <label for="cTopic">Topic</label>
+          <select id="cTopic" name="topic">
+            <option>Hardware and setup</option>
+            <option>Research collaboration</option>
+            <option>Bug report</option>
+            <option>Press</option>
+            <option>Something else</option>
+          </select>
+        </div>
+        <div class="fld" id="f-msg">
+          <label for="cMsg">Message</label>
+          <textarea id="cMsg" name="message" placeholder="What's on your mind?"></textarea>
+          <div class="err">Please write at least 10 characters</div>
+        </div>
+        <button type="submit" class="btn wide" id="cSend">Send message</button>
+        <div id="cStatus" style="margin-top:14px"></div>
+      </form>
+    </div>
+    <div>
+      <div class="card">
+        <div class="eb" style="margin-bottom:14px">Direct</div>
+        <div class="kv"><span>General</span><span><a href="mailto:hello@neurodex.app">hello@neurodex.app</a></span></div>
+        <div class="kv"><span>Research</span><span><a href="mailto:research@neurodex.app">research@neurodex.app</a></span></div>
+        <div class="kv"><span>Support</span><span><a href="mailto:support@neurodex.app">support@neurodex.app</a></span></div>
+      </div>
+      <div class="card">
+        <div class="eb" style="margin-bottom:12px">Before you write in</div>
+        <p class="dim" style="font-size:13.5px;margin:0">
+          If the headset connects but your score never leaves calibration, it is almost always contact
+          quality. Check the signal bars on the session screen and reseat the ear clip first.</p>
+        <div class="btns" style="margin-top:16px">
+          <a class="btn ghost sm" href="#/models">Read the filter docs</a>
+        </div>
+      </div>
+      <div class="note">Deployed on Vercel, this form posts as JSON to <code>/api/contact</code>, a
+        small serverless function (see <code>api/contact.js</code> in the repo) that you wire up to your
+        own email/notification service. Opened as a local file, or if that endpoint isn't reachable, it
+        falls back to your mail client instead.</div>
+    </div>
+  </div>
+</div></div>
+
+<footer id="foot"><div class="wrap">
+  <div class="cols">
+    <div>
+      <a class="brand" href="#/home" style="margin-bottom:14px"><span class="mk"><i></i></span><b>NeuroDex</b></a>
+      <p class="faint" style="font-size:13px;max-width:34ch;margin:0">
+        A thalamocortical dysrhythmia phenotyping pilot, run as neurofeedback training you level up.
+        Built for the NeuroSky ThinkGear chipset.</p>
+    </div>
+    <div><h5>Product</h5>
+      <a href="#/app">Train</a><a href="#/models">Models</a><a href="#/app">Drop rates</a></div>
+    <div><h5>Company</h5>
+      <a href="#/home">About</a><a href="#/research">Research</a><a href="#/contact">Contact</a></div>
+    <div><h5>Support</h5>
+      <a href="mailto:support@neurodex.app">Email support</a><a href="#/models">Signal quality</a></div>
+  </div>
+  <div class="btm"><span>© <span id="yr">2026</span> NeuroDex</span>
+    <span class="mono">Not a medical device. Not for diagnosis or treatment.</span></div>
+</div></footer>
+
+<div id="rev">
+  <div id="rays"></div>
+  <div id="revBox">
+    <div id="shk"><div id="revArt"><div class="pl" id="revPl"></div><div id="revSlot"></div></div></div>
+    <div id="revMeta">
+      <div id="revRar">--</div>
+      <div id="revName">--</div>
+      <div><span id="revNew" class="hidden">New specimen</span></div>
+      <p id="revFact"></p>
+      <div id="revDup" class="hidden"></div>
+      <div id="revBtns">
+        <button class="btn ghost" id="revClose">Done</button>
+        <button class="btn" id="revAgain">Open again</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="sheet"><div id="shBg"></div><div id="shBody"><div id="grab"></div><div id="shC"></div></div></div>
+<nav id="tabs"></nav>
+<div id="toast"></div>
+
+<script>
+"use strict";
+/* ============================================================
+   ART — every specimen is drawn as inline SVG on a 100x100 grid.
+   House style: bold #2B2757 outline, flat fill, one soft shade,
+   eyes only (no mouths). Rarity lives on the plate behind, never
+   on the specimen itself.
+   ============================================================ */
+const OL = "#2B2757";
+function S(w){return 'stroke="'+OL+'" stroke-width="'+(w||3)+'" stroke-linejoin="round" stroke-linecap="round"';}
+function eyes(cx,cy,sep,r){
+  var a=cx-sep/2,b=cx+sep/2,p=r*0.44;
+  return '<circle cx="'+a+'" cy="'+cy+'" r="'+r+'" fill="#fff" '+S(2)+'/>'+
+         '<circle cx="'+b+'" cy="'+cy+'" r="'+r+'" fill="#fff" '+S(2)+'/>'+
+         '<circle cx="'+a+'" cy="'+(cy+r*0.14)+'" r="'+p+'" fill="'+OL+'"/>'+
+         '<circle cx="'+b+'" cy="'+(cy+r*0.14)+'" r="'+p+'" fill="'+OL+'"/>';
+}
+const ART = {
+/* ---------- PERIPHERALS ---------- */
+nose:'<path d="M57 16c-5 12-7 27-16 39-7 10-2 23 11 23h15c11 0 16-9 11-19-7-14-9-28-9-43z" fill="#FFC9AE" '+S()+'/>'+
+  '<path d="M44 63c4-4 10-4 14 0" fill="none" '+S(2.4)+'/><path d="M66 63c3-3 8-3 11 1" fill="none" '+S(2.4)+'/>'+eyes(58,40,17,5),
+ear:'<path d="M60 12c-19 0-31 15-31 35 0 15 5 22 5 32 0 9 6 13 14 13 10 0 13-8 13-15 0-9-7-11-7-19 0-7 5-10 11-10 10 0 16-9 16-19 0-11-9-17-21-17z" fill="#FFC9AE" '+S()+'/>'+
+  '<path d="M57 33c-9 1-14 8-13 17 1 6 4 8 4 14" fill="none" '+S(2.4)+'/>'+eyes(50,60,14,4.6),
+retina:'<circle cx="50" cy="50" r="34" fill="#FFF4E4" '+S()+'/>'+
+  '<circle cx="50" cy="50" r="20" fill="#7FB2FF" '+S(2.6)+'/>'+
+  '<circle cx="50" cy="50" r="9" fill="'+OL+'"/><circle cx="44" cy="44" r="3.4" fill="#fff"/>'+
+  '<path d="M50 16v10M50 84V74M16 50h10M84 50H74M26 26l7 7M74 26l-7 7M26 74l7-7M74 74l-7-7" '+
+  'fill="none" stroke="#FF7A8A" stroke-width="2.6" stroke-linecap="round"/>',
+tastebud:'<path d="M20 76c0-22 13-38 30-38s30 16 30 38z" fill="#FF9BB0" '+S()+'/>'+
+  '<path d="M14 76h72" '+S()+'/><path d="M38 34v-9M50 32v-11M62 34v-9" fill="none" '+S(2.4)+'/>'+eyes(50,60,18,5.4),
+pacinian:'<ellipse cx="46" cy="50" rx="30" ry="22" fill="#FFD9C4" '+S()+'/>'+
+  '<ellipse cx="46" cy="50" rx="21" ry="15" fill="#FFC0A3" '+S(2.2)+'/>'+
+  '<ellipse cx="46" cy="50" rx="11" ry="7" fill="#FF9BB0" '+S(2.2)+'/>'+
+  '<path d="M76 50h14" fill="none" '+S()+'/>'+eyes(46,50,13,4.2),
+spindle:'<path d="M12 50c15-22 61-22 76 0-15 22-61 22-76 0z" fill="#FF8A8A" '+S()+'/>'+
+  '<path d="M30 36c8 9 8 19 0 28M46 33c9 11 9 23 0 34M62 36c8 9 8 19 0 28" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" opacity=".85"/>'+eyes(46,50,15,4.6),
+vagus:'<circle cx="50" cy="20" r="14" fill="#12C2C0" '+S()+'/>'+
+  '<path d="M50 34c-12 8 12 16 0 26s10 18-2 26" fill="none" '+S(4)+'/>'+
+  '<path d="M52 52c8 3 13 0 17-5M48 70c-8 3-13 1-17-4" fill="none" '+S(2.6)+'/>'+
+  '<circle cx="72" cy="45" r="5" fill="#FFC02E" '+S(2.2)+'/><circle cx="28" cy="64" r="5" fill="#FFC02E" '+S(2.2)+'/>'+eyes(50,19,15,4.6),
+sciatic:'<path d="M50 12v34" fill="none" '+S(9)+'/>'+
+  '<path d="M50 46c-4 12-14 18-18 34M50 46c4 12 14 18 18 34" fill="none" '+S(6)+'/>'+
+  '<circle cx="50" cy="16" r="13" fill="#FFB86B" '+S()+'/>'+
+  '<circle cx="31" cy="82" r="5" fill="#FF7A8A" '+S(2.2)+'/><circle cx="69" cy="82" r="5" fill="#FF7A8A" '+S(2.2)+'/>'+eyes(50,15,14,4.4),
+merkel:'<path d="M8 26c14 6 26-6 40 0s26 6 44-2" fill="none" stroke="#FFC9AE" stroke-width="9" stroke-linecap="round"/>'+
+  '<path d="M8 26c14 6 26-6 40 0s26 6 44-2" fill="none" '+S(2.2)+'/>'+
+  '<circle cx="30" cy="52" r="10" fill="#FF9BB0" '+S(2.6)+'/><circle cx="52" cy="62" r="13" fill="#FF9BB0" '+S()+'/>'+
+  '<circle cx="74" cy="52" r="10" fill="#FF9BB0" '+S(2.6)+'/>'+
+  '<path d="M30 42v-9M52 49V33M74 42v-9" fill="none" '+S(2.4)+'/>'+eyes(52,62,14,4.4),
+golgi:'<path d="M22 20c14 12 14 48 0 60M78 20c-14 12-14 48 0 60" fill="none" stroke="#FFF0D2" stroke-width="11" stroke-linecap="round"/>'+
+  '<path d="M22 20c14 12 14 48 0 60M78 20c-14 12-14 48 0 60" fill="none" '+S(2.4)+'/>'+
+  '<ellipse cx="50" cy="50" rx="20" ry="14" fill="#12C2C0" '+S()+'/>'+
+  '<path d="M30 50h-14M70 50h14" fill="none" '+S(2.6)+'/>'+eyes(50,50,15,4.6),
+
+/* ---------- DNA ---------- */
+nucleotide:'<circle cx="24" cy="30" r="13" fill="#FFC02E" '+S()+'/><text x="24" y="35" font-size="12" text-anchor="middle" fill="'+OL+'" font-family="Nunito,sans-serif" font-weight="900">P</text>'+
+  '<path d="M52 22l16 10-6 19-20 0-6-19z" fill="#12C2C0" '+S()+'/>'+
+  '<rect x="36" y="58" width="34" height="24" rx="6" fill="#FF7A8A" '+S()+'/>'+
+  '<path d="M37 30h5M50 51v7" fill="none" '+S(2.4)+'/>'+eyes(53,70,15,4.6),
+ribosome:'<path d="M18 40c0-14 14-24 32-24s32 10 32 24c0 9-6 14-14 14H32c-8 0-14-5-14-14z" fill="#C6A8FF" '+S()+'/>'+
+  '<path d="M26 58c0-3 3-5 8-5h32c5 0 8 2 8 5 0 12-10 20-24 20s-24-8-24-20z" fill="#A855F7" '+S()+'/>'+
+  '<path d="M6 55h88" fill="none" stroke="#12C2C0" stroke-width="4" stroke-linecap="round"/>'+eyes(50,36,17,5),
+mrna:'<path d="M10 62c12-16 22 12 34-4s18 10 30-6" fill="none" stroke="#12C2C0" stroke-width="8" stroke-linecap="round"/>'+
+  '<path d="M10 62c12-16 22 12 34-4s18 10 30-6" fill="none" '+S(2.2)+'/>'+
+  '<path d="M22 50v-12M40 62V50M58 50V38M76 46V34" fill="none" '+S(2.6)+'/>'+
+  '<circle cx="22" cy="34" r="5" fill="#FFC02E" '+S(2)+'/><circle cx="40" cy="47" r="5" fill="#FF7A8A" '+S(2)+'/>'+
+  '<circle cx="58" cy="34" r="5" fill="#7FB2FF" '+S(2)+'/><circle cx="76" cy="30" r="5" fill="#A855F7" '+S(2)+'/>'+eyes(44,70,15,4.4),
+trna:'<path d="M50 84V52" fill="none" '+S(7)+'/><path d="M50 52L26 30M50 52l24-22" fill="none" '+S(7)+'/>'+
+  '<circle cx="26" cy="26" r="11" fill="#7FB2FF" '+S()+'/><circle cx="74" cy="26" r="11" fill="#FFC02E" '+S()+'/>'+
+  '<rect x="38" y="76" width="24" height="16" rx="6" fill="#FF7A8A" '+S()+'/>'+
+  '<path d="M42 62h16" fill="none" '+S(2.4)+'/>'+eyes(50,50,16,4.6),
+polymerase:'<path d="M6 66h88" fill="none" stroke="#C6A8FF" stroke-width="7" stroke-linecap="round"/>'+
+  '<path d="M6 78h88" fill="none" stroke="#C6A8FF" stroke-width="7" stroke-linecap="round"/>'+
+  '<path d="M64 14c-20 0-34 12-34 30 0 10 6 16 16 16h4V44h-6c0-9 8-14 20-14z" fill="#FFC02E" '+S()+'/>'+
+  '<path d="M20 66v12M40 66v12M60 66v12M80 66v12" fill="none" '+S(2)+'/>'+eyes(52,32,15,4.6),
+telomere:'<path d="M30 14l40 34M70 14L30 48M30 86l40-34M70 86L30 52" fill="none" stroke="#C6A8FF" stroke-width="9" stroke-linecap="round"/>'+
+  '<circle cx="28" cy="12" r="8" fill="#FFC02E" '+S(2.4)+'/><circle cx="72" cy="12" r="8" fill="#FFC02E" '+S(2.4)+'/>'+
+  '<circle cx="28" cy="88" r="8" fill="#FFC02E" '+S(2.4)+'/><circle cx="72" cy="88" r="8" fill="#FFC02E" '+S(2.4)+'/>'+
+  '<circle cx="50" cy="50" r="9" fill="#A855F7" '+S(2.4)+'/>'+eyes(50,50,9,3.2),
+crispr:'<path d="M20 30c-8 0-14 7-14 18 0 16 14 30 30 34" fill="none" stroke="#12C2C0" stroke-width="5" stroke-linecap="round"/>'+
+  '<path d="M46 16c18 0 32 13 32 30 0 16-11 26-26 26-14 0-22-8-22-19 0-9 6-14 14-14h6" fill="#FF5C7A" '+S()+'/>'+
+  '<path d="M6 78h40M58 78h36" fill="none" stroke="#7FB2FF" stroke-width="6" stroke-linecap="round"/>'+
+  '<path d="M46 70l10 16M56 70l-10 16" fill="none" stroke="#FF5C7A" stroke-width="3.4" stroke-linecap="round"/>'+eyes(52,38,16,5),
+ionchannel:'<path d="M6 24h88" fill="none" stroke="#7FB2FF" stroke-width="6" stroke-linecap="round"/>'+
+  '<rect x="24" y="16" width="16" height="16" rx="4" fill="#FFC02E" '+S(2.2)+'/>'+
+  '<rect x="56" y="16" width="16" height="16" rx="4" fill="#FF7A8A" '+S(2.2)+'/>'+
+  '<path d="M30 48c0-6 5-10 12-10v42c-7 0-12-4-12-10z" fill="#12C2C0" '+S()+'/>'+
+  '<path d="M70 48c0-6-5-10-12-10v42c7 0 12-4 12-10z" fill="#12C2C0" '+S()+'/>'+
+  '<circle cx="50" cy="56" r="5" fill="#FFC02E" '+S(2)+'/><circle cx="50" cy="74" r="5" fill="#FFC02E" '+S(2)+'/>'+eyes(50,40,15,4.2),
+helicase:'<path d="M14 10c16 10 16 24 0 34M14 56c16 10 16 24 0 34" fill="none" stroke="#7FB2FF" stroke-width="6" stroke-linecap="round"/>'+
+  '<path d="M86 10C70 20 70 34 86 44M86 56C70 66 70 80 86 90" fill="none" stroke="#C6A8FF" stroke-width="6" stroke-linecap="round"/>'+
+  '<path d="M50 22l26 28-26 28-24-28z" fill="#FF5C7A" '+S()+'/>'+
+  '<path d="M26 50h-14M76 50h12" fill="none" '+S(2.4)+'/>'+eyes(50,50,16,5),
+primer:'<path d="M6 68h88" fill="none" stroke="#C6A8FF" stroke-width="8" stroke-linecap="round"/>'+
+  '<path d="M14 42h40" fill="none" stroke="#12C2C0" stroke-width="8" stroke-linecap="round"/>'+
+  '<path d="M20 52v8M32 52v8M44 52v8" fill="none" '+S(2.2)+'/>'+
+  '<path d="M60 42h22m0 0l-8-7m8 7l-8 7" fill="none" stroke="#FF5C7A" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>'+
+  '<path d="M14 42h40" fill="none" '+S(2.2)+'/>'+eyes(32,42,15,4),
+topo:'<path d="M18 18c26 22 38 42 64 64M82 18C56 40 44 60 18 82" fill="none" stroke="#7FB2FF" stroke-width="7" stroke-linecap="round"/>'+
+  '<circle cx="50" cy="50" r="24" fill="none" stroke="#FF5C7A" stroke-width="9"/>'+
+  '<circle cx="50" cy="50" r="24" fill="none" '+S(2.2)+'/><circle cx="50" cy="50" r="15" fill="none" '+S(2.2)+'/>'+
+  '<circle cx="50" cy="26" r="7" fill="#6B4FD8" '+S(2.2)+'/>'+eyes(50,50,15,4.4),
+
+/* ---------- BRAIN ---------- */
+neuron:'<path d="M40 44L18 24M40 56L16 62M46 38l4-22M62 44l18-16" fill="none" '+S(3.4)+'/>'+
+  '<circle cx="50" cy="50" r="18" fill="#FF9BC0" '+S()+'/>'+
+  '<path d="M58 62l14 22" fill="none" '+S(4)+'/>'+
+  '<path d="M72 84l10 6M72 84l-6 10M72 84l14-4" fill="none" '+S(2.6)+'/>'+eyes(50,48,16,5),
+astrocyte:'<path d="M50 32V10M50 68v22M32 50H10M68 50h22M38 38L20 20M62 38l18-18M38 62L20 80M62 62l18 18" fill="none" '+S(3.6)+'/>'+
+  '<circle cx="50" cy="50" r="17" fill="#C6A8FF" '+S()+'/>'+eyes(50,48,15,4.8),
+myelin:'<path d="M4 50h92" fill="none" '+S(5)+'/>'+
+  '<ellipse cx="24" cy="50" rx="14" ry="17" fill="#FFD08A" '+S()+'/>'+
+  '<ellipse cx="56" cy="50" rx="14" ry="17" fill="#FFD08A" '+S()+'/>'+
+  '<ellipse cx="86" cy="50" rx="11" ry="14" fill="#FFD08A" '+S()+'/>'+eyes(24,50,14,4.6),
+dendrite:'<path d="M50 90V54" fill="none" '+S(5)+'/>'+
+  '<path d="M50 54L28 32M50 54l22-22M28 32L18 18M28 32l-14 6M72 32l10-14M72 32l14 6M50 54V26" fill="none" '+S(3.2)+'/>'+
+  '<circle cx="22" cy="24" r="4" fill="#FF9BC0" '+S(2)+'/><circle cx="78" cy="24" r="4" fill="#FF9BC0" '+S(2)+'/>'+
+  '<circle cx="50" cy="22" r="4" fill="#FF9BC0" '+S(2)+'/>'+
+  '<ellipse cx="50" cy="72" rx="13" ry="15" fill="#C6A8FF" '+S()+'/>'+eyes(50,70,13,4.4),
+hippocampus:'<path d="M30 88c-14-6-18-24-10-40C29 30 46 20 62 22c14 2 22 14 20 26-2 11-12 18-22 16-8-2-12-8-10-15 2-6 8-9 13-7" fill="none" stroke="#FF9BC0" stroke-width="13" stroke-linecap="round"/>'+
+  '<path d="M30 88c-14-6-18-24-10-40C29 30 46 20 62 22c14 2 22 14 20 26-2 11-12 18-22 16-8-2-12-8-10-15 2-6 8-9 13-7" fill="none" '+S(2.4)+'/>'+eyes(56,32,14,4.4),
+amygdala:'<path d="M50 12c20 0 34 18 34 38 0 22-15 38-34 38S16 72 16 50c0-20 14-38 34-38z" fill="#FFB86B" '+S()+'/>'+
+  '<path d="M50 18c-9 10-13 22-13 32s4 22 13 32" fill="none" '+S(2.2)+' opacity=".55"/>'+eyes(52,48,18,5.4),
+thalamus:'<ellipse cx="34" cy="52" rx="20" ry="26" fill="#FFD08A" '+S()+'/>'+
+  '<ellipse cx="66" cy="52" rx="20" ry="26" fill="#2E9BFF" '+S()+'/>'+
+  '<path d="M34 26V8M66 26V8M16 38L4 28M84 38l12-10M34 78v14M66 78v14" fill="none" '+S(2.8)+'/>'+eyes(34,48,15,4.6),
+pfc:'<path d="M22 34c8-14 26-22 44-18 18 4 26 18 24 34-2 18-16 30-34 30-16 0-26-8-30-20-3-8-6-12-8-16-2-4-1-8 4-10z" fill="#FF9BC0" '+S()+'/>'+
+  '<path d="M22 34c8-14 24-22 38-19-6 12-8 26-4 40-8 8-20 8-28 0-3-8-6-12-8-16-2-4-1-3 2-5z" fill="#FFC02E" '+S(2.4)+'/>'+
+  '<path d="M62 30c6 6 8 14 6 22M74 40c4 5 5 12 3 18" fill="none" '+S(2.2)+' opacity=".5"/>'+eyes(38,44,14,4.4),
+dmn:'<path d="M20 40c6-16 24-26 42-22 18 4 28 18 26 36-2 18-18 30-36 28-14-2-24-10-28-22-2-6-6-10-8-14-2-4 0-6 4-6z" fill="none" stroke="#C6A8FF" stroke-width="7"/>'+
+  '<path d="M20 40c6-16 24-26 42-22 18 4 28 18 26 36-2 18-18 30-36 28-14-2-24-10-28-22-2-6-6-10-8-14-2-4 0-6 4-6z" fill="none" '+S(2.2)+'/>'+
+  '<path d="M34 36l24 12-14 26M34 36l10 38" fill="none" stroke="#FF5C7A" stroke-width="3"/>'+
+  '<circle cx="34" cy="36" r="9" fill="#FF5C7A" '+S(2.4)+'/><circle cx="58" cy="48" r="9" fill="#FF5C7A" '+S(2.4)+'/>'+
+  '<circle cx="44" cy="74" r="9" fill="#FF5C7A" '+S(2.4)+'/>'+eyes(58,47,9,3.2),
+ras:'<path d="M40 92c0-16-4-24-4-38 0-10 6-16 14-16s14 6 14 16c0 14-4 22-4 38z" fill="#FF9BC0" '+S()+'/>'+
+  '<path d="M50 34V16M33 40L21 26M67 40l12-14" fill="none" stroke="#6B4FD8" stroke-width="4" stroke-linecap="round"/>'+
+  '<path d="M50 8l6 11H44z" fill="#6B4FD8" '+S(2)+'/>'+
+  '<path d="M14 18l12 4-6 10z" fill="#6B4FD8" '+S(2)+'/>'+
+  '<path d="M86 18l-12 4 6 10z" fill="#6B4FD8" '+S(2)+'/>'+eyes(50,64,15,4.8),
+
+/* ---------- BONES ---------- */
+rib:'<path d="M14 16c34 2 62 26 66 62" fill="none" stroke="#FFF0D2" stroke-width="15" stroke-linecap="round"/>'+
+  '<path d="M14 16c34 2 62 26 66 62" fill="none" '+S(2.6)+'/>'+
+  '<circle cx="14" cy="16" r="10" fill="#F5E3B8" '+S(2.6)+'/>'+eyes(57,34,13,4.2),
+phalanx:'<path d="M34 26h32v48H34z" fill="#FFF0D2" '+S()+'/>'+
+  '<circle cx="30" cy="20" r="12" fill="#FFF0D2" '+S()+'/><circle cx="70" cy="20" r="12" fill="#FFF0D2" '+S()+'/>'+
+  '<circle cx="30" cy="80" r="12" fill="#FFF0D2" '+S()+'/><circle cx="70" cy="80" r="12" fill="#FFF0D2" '+S()+'/>'+
+  '<path d="M34 26h32v48H34z" fill="#FFF0D2" stroke="none"/>'+eyes(50,46,16,5),
+femur:'<circle cx="30" cy="18" r="14" fill="#FFF0D2" '+S()+'/>'+
+  '<path d="M44 26c6 16 8 34 6 52" fill="none" stroke="#FFF0D2" stroke-width="16" stroke-linecap="round"/>'+
+  '<path d="M44 26c6 16 8 34 6 52" fill="none" '+S(2.6)+'/>'+
+  '<circle cx="38" cy="84" r="12" fill="#F5E3B8" '+S()+'/><circle cx="64" cy="84" r="12" fill="#F5E3B8" '+S()+'/>'+eyes(50,50,15,4.6),
+skullplate:'<path d="M12 68c0-30 17-52 38-52s38 22 38 52z" fill="#FFF0D2" '+S()+'/>'+
+  '<path d="M12 68l9.5 10 9.5-10 9.5 10 9.5-10 9.5 10 9.5-10 9.5 10 9.5-10z" fill="#F5E3B8" '+S(2.8)+'/>'+
+  '<path d="M30 40c6-8 13-12 21-12" fill="none" '+S(2.2)+' opacity=".45"/>'+eyes(50,48,18,5.4),
+vertebra:'<path d="M24 34h52c8 0 12 6 12 14s-4 14-12 14H24c-8 0-12-6-12-14s4-14 12-14z" fill="#FFF0D2" '+S()+'/>'+
+  '<circle cx="50" cy="48" r="11" fill="#E6E4F2" '+S(2.4)+'/>'+
+  '<path d="M50 62v22" fill="none" stroke="#FFF0D2" stroke-width="12" stroke-linecap="round"/>'+
+  '<path d="M50 62v22" fill="none" '+S(2.6)+'/>'+
+  '<path d="M12 48H4M88 48h8" fill="none" '+S(2.4)+'/>'+eyes(50,34,17,4.4),
+sphenoid:'<path d="M50 40c-8-14-24-20-36-14-10 5-12 18-4 26 8 8 24 10 40 4 16 6 32 4 40-4 8-8 6-21-4-26-12-6-28 0-36 14z" fill="#FFF0D2" '+S()+'/>'+
+  '<path d="M50 40v34" fill="none" '+S(3.4)+'/>'+
+  '<path d="M40 74h20" fill="none" '+S(3)+'/>'+
+  '<path d="M22 38c6-4 14-4 20 2M78 38c-6-4-14-4-20 2" fill="none" '+S(2.2)+' opacity=".55"/>'+eyes(50,44,15,4.4),
+temporal:'<path d="M14 66c-2-30 14-50 38-50 22 0 34 14 34 32 0 20-14 32-34 32-18 0-36-4-38-14z" fill="#FFF0D2" '+S()+'/>'+
+  '<path d="M14 34l8-6 8 6 8-6 8 6 8-6 8 6" fill="none" '+S(2.4)+'/>'+
+  '<circle cx="58" cy="58" r="11" fill="#E6E4F2" '+S(2.6)+'/>'+
+  '<path d="M86 74c6 6 6 12 2 16" fill="none" '+S(2.6)+'/>'+eyes(36,56,15,4.4),
+suture:'<path d="M8 44h12l6-8 8 8h10l6-8 8 8h10l6-8 8 8h12V16H8z" fill="#FFF0D2" '+S()+'/>'+
+  '<path d="M8 56h12l6 8 8-8h10l6 8 8-8h10l6 8 8-8h12v28H8z" fill="#F5E3B8" '+S()+'/>'+eyes(50,74,17,4.8),
+foramen:'<path d="M50 10c24 0 40 18 40 40s-16 40-40 40S10 72 10 50s16-40 40-40z" fill="#FFF0D2" '+S()+'/>'+
+  '<circle cx="50" cy="54" r="21" fill="#2E2570" '+S(2.8)+'/>'+
+  '<path d="M50 54v40" fill="none" stroke="#FF5C7A" stroke-width="10" stroke-linecap="round"/>'+
+  '<path d="M50 60v34" fill="none" '+S(2.2)+'/>'+eyes(50,26,17,4.6),
+sella:'<path d="M12 76c0-10 6-16 6-30 0-8 4-12 10-12s10 5 10 13v9h24v-9c0-8 4-13 10-13s10 4 10 12c0 14 6 20 6 30z" fill="#FFF0D2" '+S()+'/>'+
+  '<circle cx="50" cy="50" r="13" fill="#FF9BC0" '+S()+'/>'+eyes(50,49,13,4.2),
+
+/* ---------- CELLS ---------- */
+rbc:'<ellipse cx="50" cy="50" rx="38" ry="30" fill="#FF5C7A" '+S()+'/>'+
+  '<ellipse cx="50" cy="50" rx="17" ry="12" fill="#D63A57" '+S(2.4)+'/>'+eyes(50,32,17,4.6),
+wbc:'<path d="M50 12c22 0 38 16 38 38 0 22-16 38-38 38S12 72 12 50c0-22 16-38 38-38z" fill="#F2F1FA" '+S()+'/>'+
+  '<path d="M38 40c8-6 16-4 20 4 6-2 12 2 12 9 0 8-7 13-16 13-11 0-19-6-19-14 0-6 2-10 3-12z" fill="#A855F7" '+S(2.6)+'/>'+eyes(50,28,16,4.4),
+platelet:'<path d="M30 30c14-8 32-6 40 6 8 12 4 28-10 34-14 6-30 2-36-10-6-12 0-24 6-30z" fill="#FFB86B" '+S()+'/>'+
+  '<path d="M28 32L14 22M70 34l14-10M74 72l12 10M30 74l-14 8" fill="none" '+S(2.8)+'/>'+eyes(48,52,15,4.6),
+epithelial:'<path d="M18 24h64v52H18z" fill="#12C2C0" '+S()+'/>'+
+  '<path d="M8 24v52M92 24v52" fill="none" '+S(2.4)+' opacity=".6"/>'+
+  '<circle cx="50" cy="52" r="13" fill="#0C9694" '+S(2.6)+'/>'+eyes(50,36,17,4.6),
+stemcell:'<circle cx="50" cy="34" r="20" fill="#FFC02E" '+S()+'/>'+
+  '<circle cx="28" cy="74" r="14" fill="#FFD98A" '+S(2.6)+' stroke-dasharray="5 4"/>'+
+  '<circle cx="72" cy="74" r="14" fill="#FFD98A" '+S(2.6)+' stroke-dasharray="5 4"/>'+
+  '<path d="M42 52L32 60M58 52l10 8" fill="none" '+S(2.6)+'/>'+eyes(50,32,16,5),
+macrophage:'<path d="M26 26c14-10 34-8 44 4 6-10 22-6 22 6 0 8-8 12-14 12 6 10 2 26-12 32-16 6-34 0-40-12-6-12-2-30 0-42z" fill="#C6A8FF" '+S()+'/>'+
+  '<circle cx="38" cy="62" r="8" fill="#6B4FD8" '+S(2.2)+'/><circle cx="58" cy="70" r="6" fill="#6B4FD8" '+S(2.2)+'/>'+
+  '<circle cx="86" cy="30" r="7" fill="#FF7A8A" '+S(2.2)+'/>'+eyes(46,42,16,4.6),
+tcell:'<circle cx="50" cy="52" r="30" fill="#3ED67B" '+S()+'/>'+
+  '<path d="M50 22V8m0 0l-5 6m5-6l5 6M22 40L10 32m0 0l6 0m-6 0l1 6M78 40l12-8m0 0l-6 0m6 0l-1 6M32 78l-8 12m0 0l0-6m0 6l6 0M68 78l8 12m0 0l0-6m0 6l-6 0" fill="none" '+S(2.4)+'/>'+
+  '<circle cx="50" cy="56" r="12" fill="#26A85C" '+S(2.4)+'/>'+eyes(50,40,16,4.6),
+oligo:'<circle cx="50" cy="26" r="15" fill="#12C2C0" '+S()+'/>'+
+  '<path d="M40 38L22 54M60 38l18 16M50 41v14" fill="none" '+S(3.2)+'/>'+
+  '<path d="M4 62h92M4 82h92" fill="none" '+S(3.4)+'/>'+
+  '<ellipse cx="22" cy="62" rx="10" ry="8" fill="#FFD08A" '+S(2.4)+'/>'+
+  '<ellipse cx="50" cy="62" rx="10" ry="8" fill="#FFD08A" '+S(2.4)+'/>'+
+  '<ellipse cx="78" cy="82" rx="10" ry="8" fill="#FFD08A" '+S(2.4)+'/>'+eyes(50,25,14,4.4),
+microglia:'<circle cx="50" cy="50" r="14" fill="#12C2C0" '+S()+'/>'+
+  '<path d="M50 36V18M50 64v18M36 50H18M64 50h18M40 40L26 26M60 40l14-14M40 60L26 74M60 60l14 14" fill="none" '+S(2.4)+'/>'+
+  '<path d="M50 18l-6-6M50 18l6-6M18 50l-6-6M18 50l-6 6M82 50l6-6M82 50l6 6M50 82l-6 6M50 82l6 6M26 26l-7-1M74 26l7-1M26 74l-7 1M74 74l7 1" fill="none" '+S(2)+'/>'+eyes(50,49,13,4.2),
+purkinje:'<path d="M50 92V60" fill="none" '+S(4.4)+'/>'+
+  '<ellipse cx="50" cy="62" rx="12" ry="13" fill="#FF9BC0" '+S()+'/>'+
+  '<path d="M50 50V26M50 44L30 24M50 44l20-20M42 34L20 34M58 34l22 0M36 28L26 12M64 28l10-16M50 26V8" fill="none" '+S(2.6)+'/>'+
+  '<path d="M30 24l-8-8M30 24l-10 2M70 24l8-8M70 24l10 2" fill="none" '+S(2)+'/>'+eyes(50,60,13,4.4)
+};
+
+/* ============================================================
+   ROSTER — 51 specimens. Facts are real; they show on the card.
+   ============================================================ */
+const TIERS = ["common","uncommon","rare","epic","mythic"];
+const TIER_NAME = {common:"Common",uncommon:"Uncommon",rare:"Rare",epic:"Epic",mythic:"Mythic"};
+const CHESTS = {
+  peripherals:{name:"Peripherals",sub:"Sensors and nerves at the body's edge",cost:100,
+    accent:"#FF5C7A",shadow:"#C93A56",odds:"standard"},
+  cells:{name:"Cells",sub:"The working population of the body",cost:140,
+    accent:"#12C2C0",shadow:"#0C7A92",odds:"enriched"},
+  bones:{name:"Bones",sub:"Skull, spine and the frame around the brain",cost:100,
+    accent:"#F2872E",shadow:"#C4651A",odds:"standard"},
+  dna:{name:"DNA",sub:"Replication, transcription, editing",cost:140,
+    accent:"#7C6BFF",shadow:"#3626A8",odds:"enriched"},
+  brain:{name:"Brain",sub:"Cortex, deep structures and the cells between",cost:180,
+    accent:"#F062C8",shadow:"#6A32B4",odds:"prime"}
+};
+const ODDS = {
+  standard:{common:52,uncommon:28,rare:14,epic:5,mythic:1},
+  enriched:{common:44,uncommon:29,rare:17,epic:8,mythic:2},
+  prime:{common:36,uncommon:29,rare:21,epic:10.5,mythic:3.5}
+};
+const REFUND = {common:15,uncommon:35,rare:70,epic:120,mythic:170};
+
+const DEX = [
+/* peripherals */
+["nose","Nose","peripherals","common","Olfactory receptor neurons are among the only neurons that get replaced throughout adult life, turning over roughly every one to two months."],
+["ear","Ear","peripherals","common","The folds of the outer ear filter sound differently depending on the direction it arrives from, which is how you localise sound with only two ears."],
+["retina","Retina","peripherals","uncommon","The retina is brain tissue. It grows out of the developing forebrain, which is why it has layered neural circuitry rather than just light sensors."],
+["tastebud","Taste Bud","peripherals","uncommon","Taste receptor cells are replaced about every ten days, so your sense of taste is rebuilt from scratch every couple of weeks."],
+["pacinian","Pacinian Corpuscle","peripherals","rare","This onion-layered receptor sits deep in the skin and responds best to vibration around 200 to 300 Hz. It goes quiet under steady pressure."],
+["spindle","Muscle Spindle","peripherals","rare","Muscle spindles report how fast a muscle is being stretched. They are the sensor behind the knee-jerk reflex."],
+["vagus","Vagus Nerve","peripherals","epic","Roughly four-fifths of vagal fibres carry signals up to the brain rather than down, making it mostly a reporting line from the organs."],
+["sciatic","Sciatic Nerve","peripherals","epic","The thickest nerve in the body, about the width of a thumb where it leaves the pelvis."],
+["merkel","Merkel Cell Complex","peripherals","mythic","Slowly adapting touch endings packed densely in the fingertips. They encode edges and fine texture, and are what braille reading depends on."],
+["golgi","Golgi Tendon Organ","peripherals","mythic","Sits in the tendon and measures muscle tension rather than length, feeding back inhibition to keep you from tearing your own tendon."],
+/* dna */
+["nucleotide","Nucleotide","dna","common","One phosphate, one sugar, one base. Around three billion of these pairs make up a human genome."],
+["ribosome","Ribosome","dna","common","Two subunits that clamp around mRNA and build protein at up to about twenty amino acids per second in bacteria."],
+["mrna","mRNA Strand","dna","uncommon","A working copy of a gene. Most human mRNA survives only minutes to hours before being degraded."],
+["trna","tRNA","dna","uncommon","The adapter molecule. One end reads a three-letter codon, the other carries the matching amino acid."],
+["polymerase","DNA Polymerase","dna","rare","Copies DNA and proofreads as it goes, ending up with roughly one error per billion bases."],
+["telomere","Telomere","dna","rare","Repeating caps on chromosome ends that shorten slightly with each division, acting as a rough replication counter."],
+["crispr","CRISPR-Cas9","dna","epic","A bacterial immune system repurposed into a programmable cutting tool. A guide RNA aims it, Cas9 makes the cut."],
+["ionchannel","Ion Channel Gene","dna","epic","Mutations in single ion channel genes cause epilepsies, long QT syndrome and some migraine subtypes."],
+["helicase","Helicase","dna","mythic","Unzips the double helix by breaking base pairs ahead of the replication machinery, burning ATP as it goes."],
+["primer","RNA Primer","dna","mythic","DNA polymerase cannot start from nothing, so primase lays down a short RNA starter that gets replaced later."],
+["topo","Topoisomerase","dna","mythic","Cuts, untwists and rejoins DNA to release the torsional strain that builds up ahead of replication."],
+/* brain */
+["neuron","Neuron","brain","common","A human brain holds on the order of 86 billion neurons, and the majority of them sit in the cerebellum, not the cortex."],
+["astrocyte","Astrocyte","brain","common","Star-shaped glia that manage potassium and glutamate around synapses and help control local blood flow."],
+["myelin","Myelin Sheath","brain","uncommon","Insulating segments that let signals jump between gaps, raising conduction speed from about 1 m/s to over 100 m/s."],
+["dendrite","Dendrite","brain","uncommon","The input surface. A single cortical neuron can carry thousands of synapses across its dendritic spines."],
+["hippocampus","Hippocampus","brain","rare","Required to lay down new episodic memories. Its curled shape is why it is named after a seahorse."],
+["amygdala","Amygdala","brain","rare","Almond-shaped and central to threat learning. It can trigger a fear response before the cortex has identified what it saw."],
+["thalamus","Thalamus","brain","epic","Nearly all sensory traffic routes through here on the way to cortex, and it fires in rhythmic loops with cortex during sleep."],
+["pfc","Prefrontal Cortex","brain","epic","Handles planning, inhibition and working memory, and is the last cortical region to finish maturing, into the mid-twenties."],
+["dmn","Default Mode Network","brain","mythic","A set of regions that gets more active when you stop attending to the outside world. Linked to self-referential thought and mind-wandering."],
+["ras","Reticular Activating System","brain","mythic","A brainstem network that sets cortical arousal. Damage here can cause coma even when the cortex is intact."],
+/* bones */
+["rib","Rib","bones","common","Twelve pairs, and the lower two float free without joining the sternum at the front."],
+["phalanx","Finger Bone","bones","common","Each finger has three phalanges and the thumb has two. Over half the bones in your body are in the hands and feet."],
+["femur","Femur","bones","uncommon","The longest and strongest bone in the body, able to carry loads of several times body weight."],
+["skullplate","Skull Plate","bones","uncommon","Cranial plates start as separate pieces so an infant's head can deform during birth, then fuse over years."],
+["vertebra","Vertebra","bones","rare","The ring at the centre forms the vertebral canal, the bony tunnel the spinal cord runs through."],
+["sphenoid","Sphenoid Bone","bones","rare","A butterfly-shaped bone that articulates with almost every other bone of the skull."],
+["temporal","Temporal Bone","bones","epic","Houses the middle and inner ear, making it the densest bone in the body to protect the cochlea."],
+["suture","Cranial Suture","bones","epic","Interlocking fibrous joints between skull plates. They stay slightly flexible for years, which also makes them low-resistance paths for current."],
+["foramen","Foramen Magnum","bones","mythic","The large opening at the skull base where the brainstem becomes the spinal cord."],
+["sella","Sella Turcica","bones","mythic","A saddle-shaped hollow in the sphenoid that cradles the pituitary gland."],
+/* cells */
+["rbc","Red Blood Cell","cells","common","Loses its nucleus while maturing to make room for haemoglobin, and survives about 120 days."],
+["wbc","White Blood Cell","cells","common","Can squeeze out of blood vessels and crawl through tissue toward chemical signals from infection."],
+["platelet","Platelet","cells","uncommon","Not a whole cell but a fragment shed from a much larger bone marrow cell called a megakaryocyte."],
+["epithelial","Epithelial Cell","cells","uncommon","Forms sealed sheets with tight junctions, which is how the blood-brain barrier keeps most molecules out."],
+["stemcell","Stem Cell","cells","rare","Can divide to produce both a copy of itself and a more specialised daughter cell."],
+["macrophage","Macrophage","cells","rare","Engulfs debris and pathogens, and also presents fragments to T-cells to start an adaptive response."],
+["tcell","T-Cell","cells","epic","Each one carries a receptor for a single specific target, and the body maintains millions of different versions."],
+["oligo","Oligodendrocyte","cells","epic","A single one can myelinate up to about fifty separate axon segments at once."],
+["microglia","Microglia","cells","mythic","The brain's resident immune cell. It constantly extends and retracts fine branches, surveying nearby synapses and pruning them."],
+["purkinje","Purkinje Cell","cells","mythic","Carries the most elaborate dendritic tree of any neuron, with something like 100,000 inputs on one cell."]
+].map(function(r){return {id:r[0],name:r[1],chest:r[2],tier:r[3],fact:r[4]};});
+const BY_ID = {}; DEX.forEach(function(d,i){d.no=i+1;BY_ID[d.id]=d;});
+const TIER_COL = {common:["#9AA5B8","#78839A"],uncommon:["#3ED67B","#26A85C"],
+  rare:["#2E9BFF","#1E74C8"],epic:["#A855F7","#8035CE"],mythic:["#FFC02E","#D99A0E"]};
+function plateBg(t){
+  var c=TIER_COL[t];
+  if(t==="mythic") return "radial-gradient(circle at 50% 34%,#FFF0C4 0%,"+c[0]+" 58%,"+c[1]+" 100%)";
+  return "radial-gradient(circle at 50% 32%,"+c[0]+" 0%,"+c[1]+" 100%)";
+}
+function svg(id){return '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">'+(ART[id]||"")+'</svg>';}
+function chestArt(key){
+  var body={peripherals:"#FFD3C4",cells:"#BFF6EA",bones:"#FFE7C2",dna:"#D6D0FF",brain:"#FBD3F2"}[key];
+  // each chest carries its own emblem on the front panel so they read apart at thumbnail size
+  var em={
+    peripherals:'<path d="M38 74l5-7 5 13 5-13 5 7" fill="none"/>',
+    cells:'<circle cx="50" cy="73" r="7.5" fill="none"/><circle cx="50" cy="73" r="2.6" fill="currentColor" stroke="none"/>',
+    bones:'<path d="M44 73h12" stroke-width="4.4" fill="none"/>'+
+          '<circle cx="42" cy="69.5" r="3"/><circle cx="42" cy="76.5" r="3"/>'+
+          '<circle cx="58" cy="69.5" r="3"/><circle cx="58" cy="76.5" r="3"/>',
+    dna:'<path d="M43 66c14 5 14 11 0 16M57 66c-14 5-14 11 0 16" fill="none"/>'+
+        '<path d="M45 71h10M45 77h10" fill="none"/>',
+    brain:'<path d="M41 78c-3-2-3-7 0-9 0-4 4-6 8-5 3-2 8-1 9 3 3 1 3 6 0 8 0 3-4 4-7 3-4 2-8 1-10-0z" fill="none"/>'+
+          '<path d="M49 64v14" fill="none"/>'
+  }[key];
+  return '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">'+
+   '<path d="M14 46h72v34a6 6 0 0 1-6 6H20a6 6 0 0 1-6-6z" fill="'+body+'" stroke="#2B2757" stroke-width="3.4" stroke-linejoin="round"/>'+
+   '<g stroke="#2B2757" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" opacity=".62" color="#2B2757">'+em+'</g>'+
+   '<path d="M12 26h76a4 4 0 0 1 4 4v14a4 4 0 0 1-4 4H12a4 4 0 0 1-4-4V30a4 4 0 0 1 4-4z" fill="#fff" stroke="#2B2757" stroke-width="3.4" stroke-linejoin="round"/>'+
+   '<rect x="42" y="40" width="16" height="22" rx="4" fill="#FFC02E" stroke="#2B2757" stroke-width="3"/>'+
+   '<circle cx="50" cy="50" r="3.4" fill="#2B2757"/></svg>';
+}
+
+/* ============================================================
+   MONOCHROME RENDERING
+   The whole site is black and white, so specimen art is remapped
+   through a luma ramp picked to contrast with its own tier plate.
+   Outline and eye whites are special-cased, since letting them
+   fall through the ramp destroys legibility at thumbnail size.
+   ============================================================ */
+const MONO_PLATE = {common:"#CFCFCF",uncommon:"#A6A6A6",rare:"#787878",epic:"#2C2C2C",mythic:"#080808"};
+const TIER_NUM   = {common:"I",uncommon:"II",rare:"III",epic:"IV",mythic:"V"};
+const DARK_PLATE = {epic:1,mythic:1};
+
+function _luma(h){
+  h=h.replace("#","");
+  var r=parseInt(h.substr(0,2),16),g=parseInt(h.substr(2,2),16),b=parseInt(h.substr(4,2),16);
+  return (0.299*r+0.587*g+0.114*b)/255;
+}
+function _gray(v){
+  var n=Math.max(0,Math.min(255,Math.round(v*255))),s=n.toString(16).padStart(2,"0");
+  return "#"+s+s+s;
+}
+function monoArt(id,tier){
+  var art=ART[id]||"", dark=!!DARK_PLATE[tier];
+  return art.replace(/#[0-9A-Fa-f]{6}/g,function(m){
+    var u=m.toUpperCase();
+    if(u==="#2B2757") return dark?"#F2F2F2":"#050505";   // outline
+    if(u==="#FFFFFF") return dark?"#0A0A0A":"#FFFFFF";   // eye whites flip with the plate
+    var L=_luma(m);
+    return dark ? _gray(0.60+L*0.38) : _gray(0.04+L*0.34);
+  });
+}
+function monoChest(key){
+  var em={
+    peripherals:'<path d="M38 74l5-7 5 13 5-13 5 7" fill="none"/>',
+    cells:'<circle cx="50" cy="73" r="7.5" fill="none"/><circle cx="50" cy="73" r="2.6" fill="#fff" stroke="none"/>',
+    bones:'<path d="M44 73h12" stroke-width="4.4" fill="none"/>'+
+          '<circle cx="42" cy="69.5" r="3"/><circle cx="42" cy="76.5" r="3"/>'+
+          '<circle cx="58" cy="69.5" r="3"/><circle cx="58" cy="76.5" r="3"/>',
+    dna:'<path d="M43 66c14 5 14 11 0 16M57 66c-14 5-14 11 0 16" fill="none"/>'+
+        '<path d="M45 71h10M45 77h10" fill="none"/>',
+    brain:'<path d="M38 82c-4-3-4-9 0-11-1-5 5-8 11-6 6-2 12 1 12 6 4 3 4 9-1 11z" fill="none"/>'+
+          '<path d="M50 66v16M42 72c5 1 8 4 8 8" fill="none"/>'
+  }[key];
+  return '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">'+
+   '<path d="M14 46h72v34a6 6 0 0 1-6 6H20a6 6 0 0 1-6-6z" fill="#1E1E1E" stroke="#F2F2F2" stroke-width="3.2" stroke-linejoin="round"/>'+
+   '<g stroke="#F2F2F2" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" opacity=".72">'+em+'</g>'+
+   '<path d="M12 26h76a4 4 0 0 1 4 4v14a4 4 0 0 1-4 4H12a4 4 0 0 1-4-4V30a4 4 0 0 1 4-4z" fill="#0A0A0A" stroke="#F2F2F2" stroke-width="3.2" stroke-linejoin="round"/>'+
+   '<rect x="42" y="40" width="16" height="22" rx="2" fill="#F2F2F2" stroke="#F2F2F2" stroke-width="3"/>'+
+   '<circle cx="50" cy="50" r="3.4" fill="#0A0A0A"/></svg>';
+}
+/* svg(id) keeps working for callers that don't care about tier */
+function svgMono(id,tier){
+  return '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">'+monoArt(id,tier||"common")+'</svg>';
+}
+/* ============================================================
+   SIGNAL ENGINE
+   Raw samples -> Hann window -> radix-2 FFT -> band powers ->
+   log ratio -> personal baseline z-score -> smoothed 0-100 index.
+   Pure functions and classes only; no DOM in this section.
+   ============================================================ */
+const BANDS = {theta:[4,8],alpha:[8,13],beta:[13,30],gamma:[30,45]};
+const BAND_KEYS = ["theta","alpha","beta","gamma"];
+
+/* ============================================================
+   ARTIFACT FILTERS  ("Models" in the UI)
+   Dry electrodes pick up far more than cortex. Each filter below
+   either transforms the window or rejects it outright. A rejected
+   window is dropped, never interpolated, so the focus index holds
+   its last value instead of being yanked by a blink.
+   ============================================================ */
+const FILTER_DEFS = [
+  {id:"ART-01",key:"contact",name:"Contact quality gate",kind:"reject",
+   blurb:"NeuroSky's ThinkGear chip reports its own electrode contact score on every packet, 0 for a clean seal up to 200 for nothing touching skin. Anything above the threshold is not weak EEG, it is the amplifier listening to open air, so the window is thrown away rather than scored.",
+   param:"Reject above",unit:"", def:50, min:10, max:200, step:10},
+  {id:"ART-02",key:"blink",name:"Ocular / blink rejection",kind:"reject",
+   blurb:"A blink swings the forehead potential harder than any real cortical rhythm and smears energy straight across theta and delta. We take the median absolute deviation of the window and reject it when any sample departs from the median by more than this many robust deviations.",
+   param:"Deviation limit",unit:"x MAD", def:6, min:3, max:12, step:0.5},
+  {id:"ART-03",key:"emg",name:"Jaw clench / EMG rejection",kind:"reject",
+   blurb:"Muscle activity from the jaw and temples is broadband and sits mostly above the EEG range. When power from 70 to 120 Hz outruns this fraction of the in-band total, the window is muscle rather than brain and gets dropped.",
+   param:"HF power ratio",unit:"", def:0.55, min:0.15, max:1.5, step:0.05},
+  {id:"ART-04",key:"clip",name:"Saturation and flatline guard",kind:"reject",
+   blurb:"Catches the two failure modes that look like signal but are not: the amplifier railing during a big movement, and a dead lead reporting a constant value. Windows breaching the voltage ceiling or showing almost no variance at all are discarded.",
+   param:"Voltage ceiling",unit:"uV", def:1500, min:200, max:4000, step:100},
+  {id:"ART-05",key:"drift",name:"Baseline drift removal",kind:"transform",
+   blurb:"Sweat, electrode settling and slow head movement add a wandering DC ramp under the real signal, which leaks into the low bands and inflates theta. We subtract a least-squares straight line from every window before the transform instead of only removing the mean.",
+   param:null},
+  {id:"ART-06",key:"line",name:"Mains hum notch",kind:"transform",
+   blurb:"Building wiring radiates at the local mains frequency and its harmonics. Rather than filter in the time domain we zero the offending bins after the FFT, which is exact and costs nothing since we are already in the frequency domain.",
+   param:"Mains frequency",unit:"Hz", def:60, min:50, max:60, step:10}
+];
+const Filters = {
+  cfg:{}, stats:{}, accepted:0, rejected:0, lastReject:null,
+  contactScore:null,       // NeuroSky poorSignal, 0 good .. 200 no contact
+  blinkFlag:0,             // decays after a reported blink event
+  init(saved){
+    FILTER_DEFS.forEach(function(f){
+      Filters.cfg[f.key]={on:true,val:f.def};
+      Filters.stats[f.key]={checked:0,rejected:0};
+    });
+    if(saved) Object.keys(saved).forEach(function(k){
+      if(Filters.cfg[k]) Filters.cfg[k]=Object.assign(Filters.cfg[k],saved[k]);
+    });
+  },
+  reset(){
+    Filters.accepted=0; Filters.rejected=0; Filters.lastReject=null;
+    Object.keys(Filters.stats).forEach(function(k){Filters.stats[k]={checked:0,rejected:0};});
+  },
+  restoreDefaults(){
+    FILTER_DEFS.forEach(function(f){ Filters.cfg[f.key]={on:true,val:f.def}; });
+  },
+  activeCount(){
+    return FILTER_DEFS.filter(function(f){return Filters.cfg[f.key].on;}).length;
+  },
+  _hit(key,rejected){
+    var st=Filters.stats[key]; st.checked++;
+    if(rejected){ st.rejected++; Filters.lastReject=key; }
+    return rejected;
+  },
+  /* linear detrend, in place */
+  detrend(buf){
+    if(!Filters.cfg.drift.on){
+      var m=0,i;
+      for(i=0;i<buf.length;i++) m+=buf[i];
+      m/=buf.length;
+      for(i=0;i<buf.length;i++) buf[i]-=m;
+      return;
+    }
+    var n=buf.length,sx=0,sy=0,sxy=0,sxx=0,j;
+    for(j=0;j<n;j++){ sx+=j; sy+=buf[j]; sxy+=j*buf[j]; sxx+=j*j; }
+    var den=n*sxx-sx*sx;
+    var slope=den?(n*sxy-sx*sy)/den:0, icept=(sy-slope*sx)/n;
+    for(j=0;j<n;j++) buf[j]-=(slope*j+icept);
+  },
+  /* time-domain rejection checks; returns true when the window should be dropped */
+  rejectTime(buf){
+    var i,n=buf.length,drop=false;
+    if(Filters.cfg.contact.on){
+      var q=Filters.contactScore;
+      if(Filters._hit("contact", q!==null && q>Filters.cfg.contact.val)) drop=true;
+    }
+    if(Filters.cfg.clip.on){
+      var ceil=Filters.cfg.clip.val,mx=0,mn=1e12,sum=0,sq=0;
+      for(i=0;i<n;i++){var v=buf[i];if(Math.abs(v)>mx)mx=Math.abs(v);
+        if(v<mn)mn=v;sum+=v;sq+=v*v;}
+      var varc=sq/n-(sum/n)*(sum/n);
+      if(Filters._hit("clip", mx>ceil || varc<1e-4)) drop=true;
+    }
+    if(Filters.cfg.blink.on){
+      var sorted=Array.prototype.slice.call(buf).sort(function(a,b){return a-b;});
+      var med=sorted[n>>1], dev=new Array(n);
+      for(i=0;i<n;i++) dev[i]=Math.abs(buf[i]-med);
+      dev.sort(function(a,b){return a-b;});
+      var mad=dev[n>>1]*1.4826, peak=dev[n-1];
+      var bad = (mad>1e-6 && peak/mad>Filters.cfg.blink.val) || Filters.blinkFlag>0;
+      if(Filters._hit("blink", bad)) drop=true;
+    }
+    if(Filters.blinkFlag>0) Filters.blinkFlag--;
+    return drop;
+  },
+  /* frequency-domain: notch out mains, then test the muscle band */
+  applySpectrum(re,im,N,fs){
+    if(Filters.cfg.line.on){
+      var f0=Filters.cfg.line.val, binHz=fs/N;
+      for(var h=1;h*f0<fs/2;h++){
+        var c=Math.round(h*f0/binHz);
+        for(var d=-1;d<=1;d++){
+          var b=c+d;
+          if(b>0&&b<N/2){ re[b]=0; im[b]=0; re[N-b]=0; im[N-b]=0; }
+        }
+      }
+    }
+    if(!Filters.cfg.emg.on) return false;
+    var bh=fs/N, lo=Math.floor(70/bh), hi=Math.min(N/2-1,Math.ceil(120/bh));
+    if(lo>=hi) return Filters._hit("emg",false);   // sample rate too low to judge
+    var hf=0,k;
+    for(k=lo;k<=hi;k++) hf+=re[k]*re[k]+im[k]*im[k];
+    hf/=Math.max(1,hi-lo+1);
+    var lo2=Math.max(1,Math.floor(4/bh)), hi2=Math.min(N/2-1,Math.ceil(45/bh)), inb=0;
+    for(k=lo2;k<=hi2;k++) inb+=re[k]*re[k]+im[k]*im[k];
+    inb/=Math.max(1,hi2-lo2+1);
+    return Filters._hit("emg", inb>0 && hf/inb>Filters.cfg.emg.val);
+  }
+};
+Filters.init(null);
+
+/* iterative in-place radix-2 FFT on split real/imag arrays */
+function fft(re,im){
+  var n=re.length,i,j=0,k,t;
+  for(i=1;i<n;i++){
+    var bit=n>>1;
+    for(;j&bit;bit>>=1) j^=bit;
+    j^=bit;
+    if(i<j){t=re[i];re[i]=re[j];re[j]=t;t=im[i];im[i]=im[j];im[j]=t;}
+  }
+  for(var len=2;len<=n;len<<=1){
+    var ang=-2*Math.PI/len, wr=Math.cos(ang), wi=Math.sin(ang);
+    for(i=0;i<n;i+=len){
+      var cr=1,ci=0;
+      for(k=0;k<len/2;k++){
+        var ur=re[i+k],ui=im[i+k];
+        var vr=re[i+k+len/2]*cr-im[i+k+len/2]*ci;
+        var vi=re[i+k+len/2]*ci+im[i+k+len/2]*cr;
+        re[i+k]=ur+vr; im[i+k]=ui+vi;
+        re[i+k+len/2]=ur-vr; im[i+k+len/2]=ui-vi;
+        var ncr=cr*wr-ci*wi; ci=cr*wi+ci*wr; cr=ncr;
+      }
+    }
+  }
+}
+function hann(n){var w=new Float64Array(n);for(var i=0;i<n;i++)w[i]=0.5-0.5*Math.cos(2*Math.PI*i/(n-1));return w;}
+
+/* rolling raw-sample buffer that emits band powers on a fixed hop */
+class BandExtractor{
+  constructor(fs){
+    this.fs=fs||256;
+    this.N=256;                       // 1 s window at 256 Hz
+    while(this.N/this.fs>1.3) this.N>>=1;
+    while(this.N/this.fs<0.6) this.N<<=1;
+    this.hop=Math.max(8,Math.round(this.fs/4)); // 4 updates per second
+    this.buf=new Float64Array(this.N);
+    this.fill=0; this.since=0;
+    this.win=hann(this.N);
+    this.onBands=null;
+  }
+  push(samples){
+    for(var i=0;i<samples.length;i++){
+      // shift-in ring behaviour without a modulo index, keeps FFT input contiguous
+      if(this.fill<this.N){ this.buf[this.fill++]=samples[i]; }
+      else { this.buf.copyWithin(0,1); this.buf[this.N-1]=samples[i]; }
+      this.since++;
+      if(this.fill>=this.N && this.since>=this.hop){ this.since=0; this._compute(); }
+    }
+  }
+  _compute(){
+    var N=this.N, i;
+    var work=new Float64Array(N);
+    work.set(this.buf);
+    Filters.detrend(work);                       // ART-05
+    if(Filters.rejectTime(work)){                // ART-01/02/04
+      Filters.rejected++;
+      if(this.onReject) this.onReject(Filters.lastReject);
+      return;
+    }
+    var re=new Float64Array(N), im=new Float64Array(N);
+    for(i=0;i<N;i++) re[i]=work[i]*this.win[i];
+    fft(re,im);
+    if(Filters.applySpectrum(re,im,N,this.fs)){  // ART-06 then ART-03
+      Filters.rejected++;
+      if(this.onReject) this.onReject("emg");
+      return;
+    }
+    Filters.accepted++;
+    var binHz=this.fs/N, out={};
+    for(var b=0;b<BAND_KEYS.length;b++){
+      var k=BAND_KEYS[b], lo=BANDS[k][0], hi=BANDS[k][1], p=0;
+      var i0=Math.max(1,Math.floor(lo/binHz)), i1=Math.min(N/2-1,Math.ceil(hi/binHz));
+      for(i=i0;i<=i1;i++) p+=re[i]*re[i]+im[i]*im[i];
+      out[k]=p/Math.max(1,(i1-i0+1));
+    }
+    if(this.onBands) this.onBands(out);
+  }
+}
+
+/* turns band powers into the focus index, against the user's own baseline */
+class Scorer{
+  constructor(calSeconds){
+    this.calSeconds=calSeconds; this.reset();
+    this.threshold=65;            // "in band" line
+  }
+  reset(){
+    this.cal=[]; this.mu=0; this.sd=1; this.ready=false;
+    this.ema=null; this.startedAt=0; this.lastRatio=0;
+  }
+  _lr(b){
+    var eps=1e-9;
+    return Math.log((b.beta+b.gamma+eps)/(b.theta+eps));
+  }
+  /* returns {phase:'cal'|'run', score, inBand, progress} */
+  update(b,elapsed){
+    var lr=this._lr(b); this.lastRatio=lr;
+    if(!this.ready){
+      this.cal.push(lr);
+      if(elapsed>=this.calSeconds && this.cal.length>8){
+        var n=this.cal.length,s=0,i;
+        for(i=0;i<n;i++) s+=this.cal[i];
+        this.mu=s/n; var v=0;
+        for(i=0;i<n;i++) v+=(this.cal[i]-this.mu)*(this.cal[i]-this.mu);
+        this.sd=Math.max(0.12,Math.sqrt(v/n));
+        this.ready=true;
+      }
+      return {phase:"cal",score:null,inBand:false,progress:Math.min(1,elapsed/this.calSeconds)};
+    }
+    var z=(lr-this.mu)/this.sd;
+    var raw=Math.max(1,Math.min(100,50+16*z));
+    this.ema = this.ema===null ? raw : this.ema+(raw-this.ema)*0.18;
+    var sc=Math.round(this.ema);
+    return {phase:"run",score:sc,inBand:sc>=this.threshold,progress:1};
+  }
+}
+
+/* ---------- sources: connect() / start(cb) / stop() ---------- */
+class SimSource{
+  constructor(){this.id="sim";this.label="Practice mode";this.fs=256;this.t=0;this.raw=true;}
+  connect(){return Promise.resolve("Practice mode ready");}
+  start(cb){
+    var self=this, fs=this.fs, chunk=Math.round(fs/16);
+    // slow wandering "attention" latent that the bands are built around
+    this.att=0; this.drift=0;
+    this.iv=setInterval(function(){
+      self.drift += (Math.random()-0.5)*0.09;
+      self.drift = Math.max(-1,Math.min(1,self.drift*0.985));
+      self.att += (self.drift-self.att)*0.06;
+      var out=new Float64Array(chunk);
+      for(var i=0;i<chunk;i++){
+        var t=self.t/fs;
+        var aTh = 26 - self.att*9, aAl = 18 - self.att*3, aBe = 9 + self.att*10, aGa = 4 + self.att*5;
+        var v = aTh*Math.sin(2*Math.PI*6*t + 0.7)
+              + aAl*Math.sin(2*Math.PI*10.5*t + 1.9)
+              + aBe*Math.sin(2*Math.PI*19*t + 0.3)
+              + aBe*0.6*Math.sin(2*Math.PI*24.5*t + 2.4)
+              + aGa*Math.sin(2*Math.PI*37*t + 1.1)
+              + (Math.random()-0.5)*14
+              + 30*Math.sin(2*Math.PI*0.9*t);      // slow drift / movement
+        out[i]=v; self.t++;
+      }
+      cb({type:"raw",fs:fs,samples:out});
+    },1000/16);
+    return true;
+  }
+  pause(){clearInterval(this.iv);}
+  stop(){clearInterval(this.iv);}
+}
+class WSSource{
+  constructor(url){this.id="ws";this.label="WebSocket bridge";this.url=url;this.fs=256;}
+  connect(){
+    var self=this;
+    return new Promise(function(res,rej){
+      var ws;
+      try{ ws=new WebSocket(self.url); }catch(e){ return rej(new Error("That URL isn't a valid WebSocket address")); }
+      var done=false;
+      var to=setTimeout(function(){ if(!done){done=true;try{ws.close();}catch(e){} rej(new Error("No response from "+self.url));} },6000);
+      ws.onopen=function(){ if(done)return; done=true; clearTimeout(to); self.ws=ws; res("Bridge connected"); };
+      ws.onerror=function(){ if(done)return; done=true; clearTimeout(to);
+        rej(new Error("Could not reach the bridge. Check it's running and on the same network.")); };
+    });
+  }
+  start(cb){
+    var self=this;
+    this.ws.onmessage=function(ev){
+      var d; try{ d=JSON.parse(ev.data); }catch(e){ return; }
+      if(Array.isArray(d)) return cb({type:"raw",fs:self.fs,samples:d});
+      // ThinkGear side-channels: contact score and blink events feed the filters directly
+      if(d.poorSignal!==undefined){
+        Filters.contactScore=+d.poorSignal;
+        if(self.onQuality) self.onQuality(+d.poorSignal);
+      }
+      if(d.blink) Filters.blinkFlag=3;
+      if(d.attention!==undefined&&self.onChip) self.onChip(+d.attention,+d.meditation||0);
+      if(d.samples&&d.samples.length) return cb({type:"raw",fs:d.fs||self.fs,samples:d.samples});
+      // NeuroSky ASIC gives 8 bands; fold them into our 4
+      if(d.asic){
+        var a=d.asic;
+        return cb({type:"bands",bands:{
+          theta:+a.theta||0,
+          alpha:(+a.lowAlpha||0)+(+a.highAlpha||0),
+          beta:(+a.lowBeta||0)+(+a.highBeta||0),
+          gamma:(+a.lowGamma||0)+(+a.midGamma||0)}});
+      }
+      if(d.theta!==undefined) return cb({type:"bands",bands:{
+        theta:+d.theta||0,alpha:+d.alpha||0,beta:+d.beta||0,gamma:+d.gamma||0}});
+    };
+    this.ws.onclose=function(){ if(self.onDrop) self.onDrop("Bridge disconnected"); };
+    return true;
+  }
+  pause(){ try{ this.ws.onmessage=null; }catch(e){} }
+  stop(){ try{ this.ws.onclose=null; this.ws.close(); }catch(e){} }
+}
+class NeuroSkySource extends WSSource{
+  constructor(url){
+    super(url);
+    this.id="neurosky"; this.label="NeuroSky headset";
+    this.fs=512;                     // MindWave raw wave rate
+  }
+}
+class BLESource{
+  constructor(cfg){
+    this.id="ble"; this.label="Bluetooth headband";
+    this.svc=(cfg.service||"").toLowerCase().trim();
+    this.chr=(cfg.characteristic||"").toLowerCase().trim();
+    this.fmt=cfg.format||"muse12"; this.fs=+cfg.fs||256;
+  }
+  connect(){
+    var self=this;
+    if(!navigator.bluetooth) return Promise.reject(new Error(
+      "This browser has no Web Bluetooth. Use Chrome on Android, or the native build on iOS."));
+    return navigator.bluetooth.requestDevice({
+      filters:[{services:[self.svc]}], optionalServices:[self.svc]
+    }).then(function(dev){
+      self.dev=dev;
+      dev.addEventListener("gattserverdisconnected",function(){ if(self.onDrop) self.onDrop("Headband disconnected"); });
+      return dev.gatt.connect();
+    }).then(function(server){ return server.getPrimaryService(self.svc); })
+      .then(function(s){ return s.getCharacteristic(self.chr); })
+      .then(function(c){ self.c=c; return c.startNotifications(); })
+      .then(function(){ return (self.dev.name||"Headband")+" connected"; });
+  }
+  start(cb){
+    var self=this;
+    this.handler=function(e){
+      var dv=e.target.value, out=[];
+      if(self.fmt==="muse12"){
+        // 2-byte packet index, then 12 samples packed at 12 bits each
+        for(var s=0;s<12;s++){
+          var bit=16+s*12, byi=bit>>3, sh=bit&7, raw;
+          if(sh===0) raw=(dv.getUint8(byi)<<4)|(dv.getUint8(byi+1)>>4);
+          else       raw=((dv.getUint8(byi)&0x0f)<<8)|dv.getUint8(byi+1);
+          out.push((raw-2048)*0.48828125);   // to microvolts
+        }
+      }else if(self.fmt==="int16le"){
+        for(var i=0;i+1<dv.byteLength;i+=2) out.push(dv.getInt16(i,true)*0.1);
+      }else{
+        for(var j=0;j+3<dv.byteLength;j+=4) out.push(dv.getFloat32(j,true));
+      }
+      cb({type:"raw",fs:self.fs,samples:out});
+    };
+    this.c.addEventListener("characteristicvaluechanged",this.handler);
+    return true;
+  }
+  pause(){ try{ this.c.removeEventListener("characteristicvaluechanged",this.handler); }catch(e){} }
+  stop(){
+    try{ this.c.removeEventListener("characteristicvaluechanged",this.handler);
+         this.c.stopNotifications(); this.dev.gatt.disconnect(); }catch(e){}
+  }
+}
+
+/* ============================================================
+   HAPTICS
+   navigator.vibrate covers Android. iOS Safari exposes no
+   vibration API at all, so the app says so rather than pretending.
+   ============================================================ */
+const Haptics = {
+  supported: typeof navigator!=="undefined" && typeof navigator.vibrate==="function",
+  on:true, audio:false, ctx:null, lastPulse:0,
+  _v(p){ if(!this.on||!this.supported) return false; try{ navigator.vibrate(p); return true; }catch(e){ return false; } },
+  _beep(f,ms,vol){
+    if(!this.audio) return;
+    try{
+      this.ctx = this.ctx || new (window.AudioContext||window.webkitAudioContext)();
+      if(this.ctx.state==="suspended") this.ctx.resume();
+      var o=this.ctx.createOscillator(), g=this.ctx.createGain();
+      o.type="sine"; o.frequency.value=f;
+      g.gain.setValueAtTime(0,this.ctx.currentTime);
+      g.gain.linearRampToValueAtTime(vol||0.16,this.ctx.currentTime+0.012);
+      g.gain.exponentialRampToValueAtTime(0.0001,this.ctx.currentTime+ms/1000);
+      o.connect(g); g.connect(this.ctx.destination);
+      o.start(); o.stop(this.ctx.currentTime+ms/1000+0.02);
+    }catch(e){}
+  },
+  /* soft cue each time the index crosses up into the target band */
+  inBand(){
+    var now=Date.now(); if(now-this.lastPulse<1200) return; this.lastPulse=now;
+    this._v(18); this._beep(660,90,0.10);
+  },
+  tap(){ this._v(12); },
+  /* escalating rumble while the chest shakes */
+  buildUp(){ this._v([0,30,120,40,110,55,95,70,80,90,60,120,50]); this._beep(300,700,0.06); },
+  reveal(tier){
+    var pat={
+      common:[0,40],
+      uncommon:[0,50,60,50],
+      rare:[0,60,50,60,50,90],
+      epic:[0,70,40,70,40,70,40,140],
+      mythic:[0,90,40,60,40,90,40,60,40,120,60,260]
+    }[tier]||[0,40];
+    this._v(pat);
+    var f={common:520,uncommon:600,rare:700,epic:820,mythic:960}[tier]||520;
+    this._beep(f,tier==="mythic"?520:240,0.14);
+    if(tier==="mythic"||tier==="epic") setTimeout(()=>this._beep(f*1.5,300,0.12),160);
+  },
+  newSpecimen(){ this._v([0,25,45,25,45,120]); setTimeout(()=>this._beep(1180,200,0.13),40); },
+  done(){ this._v([0,60,70,110]); this._beep(740,220,0.12); }
+};
+
+/* ============================================================
+   STORAGE — artifact storage first, then localStorage, then memory.
+   ============================================================ */
+const Store = (function(){
+  var mem={}, mode="memory";
+  var hasArt = typeof window!=="undefined" && window.storage && typeof window.storage.get==="function";
+  if(hasArt) mode="artifact";
+  else { try{ var k="__nd";localStorage.setItem(k,"1");localStorage.removeItem(k);mode="local"; }catch(e){ mode="memory"; } }
+  return {
+    mode:mode,
+    async get(key,def){
+      try{
+        if(mode==="artifact"){ var r=await window.storage.get(key); return r&&r.value?JSON.parse(r.value):def; }
+        if(mode==="local"){ var v=localStorage.getItem(key); return v?JSON.parse(v):def; }
+        return key in mem?mem[key]:def;
+      }catch(e){ return def; }
+    },
+    async set(key,val){
+      var s=JSON.stringify(val);
+      try{
+        if(mode==="artifact"){ await window.storage.set(key,s); return true; }
+        if(mode==="local"){ localStorage.setItem(key,s); return true; }
+        mem[key]=val; return true;
+      }catch(e){ mem[key]=val; return false; }
+    },
+    async clear(keys){
+      for(var i=0;i<keys.length;i++){
+        try{
+          if(mode==="artifact") await window.storage.delete(keys[i]);
+          else if(mode==="local") localStorage.removeItem(keys[i]);
+          else delete mem[keys[i]];
+        }catch(e){}
+      }
+    }
+  };
+})();
+/* ============================================================
+   APP
+   ============================================================ */
+const $=function(s){return document.querySelector(s);};
+const $$=function(s){return Array.prototype.slice.call(document.querySelectorAll(s));};
+const KEYS=["nd:profile","nd:dex","nd:sessions","nd:settings"];
+
+const state={
+  ions:0,
+  owned:{},                 // id -> {n, first}
+  sessions:[],              // {date, avg, dur, band}
+  streak:0, lastDay:null, totalSec:0,
+  settings:{haptics:true,audio:false,motion:true,calSec:60,threshold:65,
+            srcId:"neurosky",nsUrl:"ws://localhost:8765",wsUrl:"ws://192.168.1.50:8765",
+            bleSvc:"0000fe8d-0000-1000-8000-00805f9b34fb",
+            bleChr:"273e0003-4c4d-454d-96be-f03bac821358",
+            bleFmt:"muse12",recordRaw:false},
+  durMin:3,
+  src:null, connected:false, srcMsg:"",
+  running:false, phase:"idle",
+  scorer:null, extractor:null,
+  hist:[], rawDisp:new Float32Array(560), rawI:0,
+  bands:{theta:0,alpha:0,beta:0,gamma:0},
+  bandsMax:{theta:1,alpha:1,beta:1,gamma:1},
+  t0:0, elapsed:0, inBandSec:0, sum:0, sumN:0, wasIn:false,
+  lastSummary:null, pendingChest:null, quality:null, chip:null, rejFlash:0,
+  /* raw capture for the offline MNE artifact-audit pass — not persisted to Store,
+     kept in memory only for the current session and the most recent completed one */
+  rawCap:null, rawFs:256, rawCapMax:400000, lastRaw:null
+};
+
+function toast(msg){
+  var t=$("#toast"); t.textContent=msg; t.classList.add("on");
+  clearTimeout(toast._t); toast._t=setTimeout(function(){t.classList.remove("on");},2100);
+}
+function fmtTime(s){var m=Math.floor(s/60);return m+":"+String(Math.floor(s%60)).padStart(2,"0");}
+function fmtDur(sec){
+  if(sec<60) return Math.round(sec)+"s";
+  var h=Math.floor(sec/3600),m=Math.round(sec%3600/60);
+  return h?h+"h "+m+"m":m+"m";
+}
+function today(){var d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
+function dayDiff(a,b){return Math.round((new Date(b)-new Date(a))/86400000);}
+
+/* ---------- persistence ---------- */
+async function load(){
+  var p=await Store.get("nd:profile",null);
+  if(p){state.ions=p.ions||0;state.streak=p.streak||0;state.lastDay=p.lastDay||null;state.totalSec=p.totalSec||0;}
+  state.owned=await Store.get("nd:dex",{})||{};
+  state.sessions=await Store.get("nd:sessions",[])||[];
+  var s=await Store.get("nd:settings",null);
+  if(s) Object.assign(state.settings,s);
+  Haptics.on=state.settings.haptics; Haptics.audio=state.settings.audio;
+  document.body.classList.toggle("norm",!state.settings.motion);
+}
+function saveProfile(){return Store.set("nd:profile",{ions:state.ions,streak:state.streak,lastDay:state.lastDay,totalSec:state.totalSec});}
+function saveDex(){return Store.set("nd:dex",state.owned);}
+function saveSessions(){return Store.set("nd:sessions",state.sessions.slice(-120));}
+function saveSettings(){return Store.set("nd:settings",state.settings);}
+
+function setIons(v){
+  state.ions=Math.max(0,Math.round(v));
+  $$("#ionA,#ionB").forEach(function(e){e.textContent=state.ions;});
+  saveProfile(); renderChests();
+}
+
+/* ---------- tabs ---------- */
+const TABS=[
+  ["session","Session",'<path d="M3 12h4l3-8 4 16 3-8h4"/>'],
+  ["chests","Chests",'<path d="M3 8h18v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M2 4h20v4H2z"/><path d="M12 8v13"/>'],
+  ["dex","Dex",'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>'],
+  ["stats","Progress",'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>']
+];
+function buildTabs(){
+  $("#tabs").innerHTML=TABS.map(function(t,i){
+    return '<button data-t="'+t[0]+'"'+(i===0?' class="on"':'')+'>'+
+      '<svg viewBox="0 0 24 24">'+t[2]+'</svg><span>'+t[1]+'</span></button>';
+  }).join("");
+  $$("#tabs button").forEach(function(b){
+    b.onclick=function(){goTab(b.dataset.t);};
+  });
+}
+function goTab(name){
+  $$(".screen").forEach(function(s){s.classList.toggle("on",s.id==="s-"+name);});
+  $$("#tabs button").forEach(function(b){b.classList.toggle("on",b.dataset.t===name);});
+  try{ window.scrollTo(0,0); }catch(e){}
+  if(name==="dex") renderDex();
+  if(name==="stats") renderStats();
+  if(name==="chests") renderChests();
+  Haptics.tap();
+}
+
+/* ============================================================
+   SESSION SCREEN
+   ============================================================ */
+function buildBands(){
+  $("#bands").innerHTML=BAND_KEYS.map(function(k){
+    return '<div class="bd" data-b="'+k+'"><div class="n">'+k.charAt(0).toUpperCase()+k.slice(1)+'</div>'+
+      '<div class="v" id="bv-'+k+'">--</div><div class="bar"><i id="bb-'+k+'"></i></div></div>';
+  }).join("");
+}
+const SOURCES=[
+  {id:"neurosky",nm:"NeuroSky headset",rec:1,
+   ds:"MindWave, MindWave Mobile or Mobile 2 through the bundled Python bridge. Streams the raw 512 Hz wave plus the chip's own contact score and blink events."},
+  {id:"sim",nm:"Practice mode",
+   ds:"Synthetic signal with realistic drift. The whole loop, no hardware. Logged as practice."},
+  {id:"ws",nm:"Generic bridge",
+   ds:"Any other rig that can post JSON over WebSocket: OpenBCI, Muse via BrainFlow, a lab amp."},
+  {id:"ble",nm:"Bluetooth LE headband",
+   ds:"Direct Web Bluetooth for BLE headbands. NeuroSky MindWave is Bluetooth Classic and cannot use this path."}
+];
+function renderSources(){
+  $("#srcList").innerHTML=SOURCES.map(function(s){
+    return '<button class="src'+(state.settings.srcId===s.id?" on":"")+'" data-s="'+s.id+'">'+
+      '<span class="rd"></span><span style="min-width:0"><span class="nm">'+s.nm+
+      (s.rec?'<span class="rec">Your hardware</span>':'')+'</span>'+
+      '<span class="ds">'+s.ds+'</span></span></button>';
+  }).join("");
+  $$("#srcList .src").forEach(function(b){
+    b.onclick=function(){
+      if(state.running) return toast("Stop the session first");
+      state.settings.srcId=b.dataset.s; saveSettings(); dropSource(); renderSources();
+    };
+  });
+  var c=$("#srcCfg"), s=state.settings;
+  if(s.srcId==="neurosky"){
+    c.innerHTML='<div class="fld" style="margin-top:14px"><label>Bridge address</label>'+
+      '<input id="nsUrl" value="'+s.nsUrl+'" placeholder="ws://192.168.1.50:8765" autocapitalize="off" spellcheck="false"></div>'+
+      '<div class="note">Run <b>python3 eeg-bridge.py --source neurosky --port /dev/tty.MindWaveMobile</b> '+
+      'on the machine paired with the headset, then point this at that machine. Use its LAN address, '+
+      'not localhost, if you are on a phone.</div>';
+    $("#nsUrl").onchange=function(){s.nsUrl=this.value.trim();saveSettings();};
+  }else if(s.srcId==="ws"){
+    c.innerHTML='<div class="fld" style="margin-top:14px"><label>Bridge address</label>'+
+      '<input id="wsUrl" value="'+s.wsUrl+'" placeholder="ws://192.168.1.50:8765" autocapitalize="off" spellcheck="false"></div>'+
+      '<div class="note">Send either <b>{"theta":..,"alpha":..,"beta":..,"gamma":..}</b> or '+
+      '<b>{"fs":256,"samples":[..]}</b> per message.</div>';
+    $("#wsUrl").onchange=function(){s.wsUrl=this.value.trim();saveSettings();};
+  }else if(s.srcId==="ble"){
+    c.innerHTML='<div class="fld" style="margin-top:14px"><label>Service UUID</label><input id="bs" value="'+s.bleSvc+'" autocapitalize="off" spellcheck="false"></div>'+
+      '<div class="fld"><label>Characteristic UUID</label><input id="bc" value="'+s.bleChr+'" autocapitalize="off" spellcheck="false"></div>'+
+      '<div class="fld"><label>Packet format</label><select id="bf">'+
+      '<option value="muse12"'+(s.bleFmt==="muse12"?" selected":"")+'>12-bit packed (Muse style)</option>'+
+      '<option value="int16le"'+(s.bleFmt==="int16le"?" selected":"")+'>Int16 little-endian</option>'+
+      '<option value="float32"'+(s.bleFmt==="float32"?" selected":"")+'>Float32 little-endian</option></select></div>'+
+      (navigator.bluetooth?"":'<div class="note">This browser has no Web Bluetooth. On iOS every browser blocks it.</div>');
+    $("#bs").onchange=function(){s.bleSvc=this.value.trim();saveSettings();};
+    $("#bc").onchange=function(){s.bleChr=this.value.trim();saveSettings();};
+    $("#bf").onchange=function(){s.bleFmt=this.value;saveSettings();};
+  }else c.innerHTML="";
+}
+/* NeuroSky reports 0 for a clean seal up to 200 for nothing touching skin */
+function setQuality(q){
+  state.quality=q;
+  var bars=$("#sigBars"), txt=$("#sigTxt");
+  if(!bars) return;
+  var lit,label;
+  if(q===null||q===undefined){ lit=0; label=state.connected?"Waiting":"No link"; }
+  else if(q>=200){ lit=0; label="No contact"; }
+  else if(q>50){ lit=1; label="Poor "+q; }
+  else if(q>25){ lit=2; label="Fair "+q; }
+  else if(q>0){ lit=3; label="Good "+q; }
+  else { lit=4; label="Clean"; }
+  Array.prototype.forEach.call(bars.children,function(b,i){
+    b.classList.toggle("lit",i<lit);
+  });
+  txt.textContent=label;
+}
+function buildSigBars(){
+  var b=$("#sigBars"); if(!b) return;
+  b.innerHTML="";
+  for(var i=0;i<4;i++){
+    var el=document.createElement("i");
+    el.style.height=(5+i*2.6)+"px";
+    b.appendChild(el);
+  }
+}
+function srcState(txt,cls){
+  var e=$("#srcState"); e.textContent=txt; e.className="pill"+(cls?" "+cls:"");
+}
+function makeSource(){
+  var s=state.settings;
+  if(s.srcId==="neurosky") return new NeuroSkySource(s.nsUrl);
+  if(s.srcId==="ws") return new WSSource(s.wsUrl);
+  if(s.srcId==="ble") return new BLESource({service:s.bleSvc,characteristic:s.bleChr,format:s.bleFmt});
+  return new SimSource();
+}
+function dropSource(){
+  if(state.src){ try{state.src.stop();}catch(e){} }
+  state.src=null; state.connected=false;
+  Filters.contactScore=null;
+  srcState("Not connected"); setQuality(null);
+  $("#discBtn").classList.add("hidden");
+  $("#connBtn").classList.remove("hidden");
+}
+async function connect(){
+  if(state.connected) return;
+  srcState("Connecting…","warn");
+  var src=makeSource();
+  try{
+    var msg=await src.connect();
+    state.src=src; state.connected=true;
+    src.onQuality=function(q){ setQuality(q); };
+    src.onChip=function(att,med){ state.chip={att:att,med:med}; };
+    src.onDrop=function(why){
+      toast(why);
+      if(state.running) endSession(true);
+      dropSource(); renderSources();
+    };
+    srcState(state.settings.srcId==="sim"?"Practice ready":"Connected","ok");
+    if(state.settings.srcId==="sim"){ Filters.contactScore=0; setQuality(0); }
+    else setQuality(null);
+    $("#connBtn").classList.add("hidden");
+    $("#discBtn").classList.remove("hidden");
+    $("#needSrc").classList.add("hidden");
+    toast(msg);
+  }catch(e){
+    dropSource();
+    srcState("Failed","bad");
+    toast(e.message||"Could not connect");
+  }
+}
+
+function onPacket(p){
+  if(!state.running) return;
+  if(p.type==="bands"){ handleBands(p.bands); return; }
+  // keep a decimated copy for the live waveform
+  var st=Math.max(1,Math.floor(p.samples.length/12));
+  for(var i=0;i<p.samples.length;i+=st){
+    state.rawDisp[state.rawI]=p.samples[i];
+    state.rawI=(state.rawI+1)%state.rawDisp.length;
+  }
+  // full-resolution capture for the offline MNE artifact-audit pass, capped so a
+  // long session can't grow this without bound
+  if(state.settings.recordRaw && state.rawCap && state.rawCap.length<state.rawCapMax){
+    state.rawFs=p.fs||256;
+    var room=state.rawCapMax-state.rawCap.length;
+    for(var j=0;j<p.samples.length && j<room;j++) state.rawCap.push(p.samples[j]);
+  }
+  if(!state.extractor || state.extractor.fs!==(p.fs||256)){
+    state.extractor=new BandExtractor(p.fs||256);
+    state.extractor.onBands=handleBands;
+    state.extractor.onReject=onReject;
+  }
+  state.extractor.push(p.samples);
+}
+/* a window was thrown out by one of the artifact filters */
+function onReject(which){
+  state.rejFlash=8;
+  var t=$("#sTag");
+  if(t && state.running){
+    t.textContent="Artifact \u00B7 "+which;
+    t.className="tag warn";
+  }
+  if(curPage==="models") updateFilterTotals();
+}
+function handleBands(b){
+  state.bands=b;
+  BAND_KEYS.forEach(function(k){
+    state.bandsMax[k]=Math.max(state.bandsMax[k]*0.995,b[k]);
+    var pct=Math.min(100,100*b[k]/(state.bandsMax[k]||1));
+    var bb=$("#bb-"+k); if(bb) bb.style.width=pct.toFixed(1)+"%";
+    var bv=$("#bv-"+k); if(bv) bv.textContent=b[k]>=100?Math.round(b[k]):b[k].toFixed(1);
+  });
+  var el=(Date.now()-state.t0)/1000;
+  var r=state.scorer.update(b,el);
+  if(r.phase==="cal"){
+    state.phase="cal";
+    $("#calStrip").firstElementChild.style.width=(r.progress*100)+"%";
+    $("#sVal").textContent="--";
+    $("#sLab").textContent="Calibrating baseline";
+    $("#sTag").textContent="Baseline";
+    $("#sTag").className="tag";
+  }else{
+    if(state.phase==="cal"){ toast("Baseline set. Go."); Haptics.done(); }
+    state.phase="run";
+    $("#calStrip").firstElementChild.style.width="100%";
+    $("#sVal").textContent=r.score;
+    $("#sVal").classList.toggle("big",r.inBand);
+    $("#sLab").textContent="Focus index";
+    $("#sTag").textContent=r.inBand?"In band":"Below band";
+    $("#sTag").className="tag"+(r.inBand?" bad":"");
+    state.hist.push(r.score); if(state.hist.length>240) state.hist.shift();
+    state.sum+=r.score; state.sumN++;
+    if(r.inBand){ state.inBandSec+=0.25; if(!state.wasIn) Haptics.inBand(); }
+    state.wasIn=r.inBand;
+  }
+}
+
+/* ---------- canvas ---------- */
+function fitCanvas(c){
+  var r=window.devicePixelRatio||1, w=c.clientWidth, h=c.clientHeight;
+  if(!w||!h) return null;
+  if(c.width!==Math.round(w*r)||c.height!==Math.round(h*r)){
+    c.width=Math.round(w*r); c.height=Math.round(h*r);
+  }
+  var x=c.getContext("2d"); x.setTransform(r,0,0,r,0,0); return {x:x,w:w,h:h};
+}
+function drawTrace(){
+  var c=$("#trace"), g=fitCanvas(c); if(!g) return;
+  var x=g.x, W=g.w, H=g.h;
+  x.clearRect(0,0,W,H);
+  var thr=state.settings.threshold;
+  var yOf=function(v){return H-8-(v/100)*(H-24);};
+  // target band shading
+  x.fillStyle="rgba(255,255,255,.055)";
+  x.fillRect(0,yOf(100),W,yOf(thr)-yOf(100));
+  x.strokeStyle="rgba(255,255,255,.34)"; x.setLineDash([4,4]); x.lineWidth=1;
+  x.beginPath(); x.moveTo(0,yOf(thr)); x.lineTo(W,yOf(thr)); x.stroke(); x.setLineDash([]);
+  // right-aligned, clamped below the state pill, so it never sits under the score readout on the left
+  x.font="400 9px JetBrains Mono,monospace";
+  var tLabel="TARGET "+thr+"+", tw=x.measureText(tLabel).width, tx=W-10-tw, ty=Math.max(yOf(thr)-6,40);
+  x.fillStyle="rgba(255,255,255,.10)";
+  x.beginPath(); x.roundRect?x.roundRect(tx-6,ty-11,tw+12,15,7):x.rect(tx-6,ty-11,tw+12,15); x.fill();
+  x.fillStyle="rgba(255,255,255,.7)";
+  x.fillText(tLabel,tx,ty);
+
+  if(state.phase==="cal"||(!state.running&&!state.hist.length)){
+    // live waveform while calibrating / idle
+    x.strokeStyle=state.running?"rgba(255,255,255,.7)":"rgba(255,255,255,.14)";
+    x.lineWidth=2; x.beginPath();
+    var n=state.rawDisp.length, mx=1;
+    for(var i=0;i<n;i++) mx=Math.max(mx,Math.abs(state.rawDisp[i]));
+    for(var j=0;j<n;j++){
+      var idx=(state.rawI+j)%n, vx=j/(n-1)*W, vy=H/2-(state.rawDisp[idx]/mx)*(H/2-18);
+      j?x.lineTo(vx,vy):x.moveTo(vx,vy);
+    }
+    x.stroke(); return;
+  }
+  var h=state.hist; if(!h.length) return;
+  var n2=Math.max(60,h.length), step=W/(n2-1), off=n2-h.length;
+  x.beginPath();
+  x.moveTo(off*step,H);
+  for(var k=0;k<h.length;k++) x.lineTo((off+k)*step,yOf(h[k]));
+  x.lineTo((off+h.length-1)*step,H); x.closePath();
+  var grd=x.createLinearGradient(0,0,0,H);
+  grd.addColorStop(0,"rgba(255,255,255,.30)"); grd.addColorStop(1,"rgba(255,255,255,0)");
+  x.fillStyle=grd; x.fill();
+  x.beginPath();
+  for(var m=0;m<h.length;m++){
+    var px=(off+m)*step, py=yOf(h[m]);
+    m?x.lineTo(px,py):x.moveTo(px,py);
+  }
+  x.strokeStyle="#fff"; x.lineWidth=2; x.lineJoin="round"; x.stroke();
+  var lx=(off+h.length-1)*step, ly=yOf(h[h.length-1]);
+  x.fillStyle="#fff"; x.fillRect(lx-2.5,ly-2.5,5,5);
+}
+function tick(){
+  if(state.running){
+    state.elapsed=(Date.now()-state.t0)/1000;
+    var total=state.durMin*60+state.settings.calSec;
+    $("#clk").textContent=fmtTime(Math.max(0,total-state.elapsed));
+    if(state.elapsed>=total) endSession(false);
+  }
+  if(curPage==="app") drawTrace();
+  else if(curPage==="models" && state.running && (tick._n=(tick._n||0)+1)%30===0) renderModels();
+  requestAnimationFrame(tick);
+}
+
+/* ---------- session control ---------- */
+function startSession(){
+  if(!state.connected){ $("#needSrc").classList.remove("hidden"); return toast("Connect a source first"); }
+  state.scorer=new Scorer(state.settings.calSec);
+  state.scorer.threshold=state.settings.threshold;
+  state.extractor=null;
+  state.hist=[]; state.rawDisp.fill(0); state.rawI=0;
+  state.rawCap=state.settings.recordRaw?[]:null;
+  state.sum=0; state.sumN=0; state.inBandSec=0; state.wasIn=false;
+  state.bandsMax={theta:1,alpha:1,beta:1,gamma:1};
+  state.t0=Date.now(); state.running=true; state.phase="cal";
+  $("#startBtn").classList.add("hidden"); $("#stopBtn").classList.remove("hidden");
+  $("#sumCard").classList.add("hidden");
+  $("#calStrip").classList.remove("hidden");
+  $("#needSrc").classList.add("hidden");
+  state.src.start(onPacket);
+  Haptics.tap();
+  if(Haptics.audio) Haptics._beep(520,120,0.1);
+}
+function endSession(aborted){
+  if(!state.running) return;
+  state.running=false;
+  // pause the stream but keep the link, so the next session starts instantly
+  try{ state.src.pause?state.src.pause():state.src.stop(); }catch(e){}
+  $("#startBtn").classList.remove("hidden"); $("#stopBtn").classList.add("hidden");
+  $("#sTag").textContent="Idle"; $("#sTag").className="tag";
+  $("#calStrip").firstElementChild.style.width="0%";
+  var trained=Math.max(0,state.elapsed-state.settings.calSec);
+  var histCopy=state.hist.slice();      // grab the curve before the live view resets
+  if(state.rawCap && state.rawCap.length) state.lastRaw={fs:state.rawFs,samples:state.rawCap,capped:state.rawCap.length>=state.rawCapMax};
+  state.rawCap=null;
+  resetHero();
+  if(state.sumN<8||trained<20){
+    toast(aborted?"Session dropped":"Too short to score");
+    return;
+  }
+  var avg=state.sum/state.sumN;
+  var bandPct=Math.round(100*state.inBandSec/Math.max(1,trained));
+  var mins=trained/60;
+  var earned=Math.round(avg*mins*0.9);
+  setIons(state.ions+earned);
+  state.totalSec+=trained;
+  var d=today();
+  if(state.lastDay!==d){
+    state.streak = state.lastDay && dayDiff(state.lastDay,d)===1 ? state.streak+1 : 1;
+    state.lastDay=d;
+  }
+  state.sessions.push({date:new Date().toISOString(),avg:Math.round(avg),dur:Math.round(trained),
+    band:bandPct,practice:state.settings.srcId==="sim"});
+  saveSessions(); saveProfile();
+  state.lastSummary={avg:Math.round(avg),band:bandPct,earned:earned,hist:histCopy};
+  showSummary();
+  Haptics.done();
+}
+/* returns the hero trace to a quiet idle state so a finished session doesn't
+   stay frozen on screen under the summary card */
+function resetHero(){
+  state.phase="idle";
+  state.hist=[];
+  state.rawDisp.fill(0); state.rawI=0;
+  $("#sVal").textContent="--";
+  $("#sVal").classList.remove("big");
+  $("#sLab").textContent="Focus index";
+}
+function showSummary(){
+  var s=state.lastSummary; if(!s) return;
+  $("#sumCard").classList.remove("hidden");
+  $("#sumT").textContent = s.avg>=72?"Strong session":s.avg>=58?"Solid session":"Session logged";
+  $("#sumAvg").textContent=s.avg;
+  $("#sumBand").textContent=s.band+"%";
+  $("#sumIons").textContent="+"+s.earned;
+  var c=$("#sumC"), g=fitCanvas(c); if(!g) return;
+  var x=g.x, W=g.w, H=g.h;
+  x.clearRect(0,0,W,H);
+  var h=s.hist; if(!h.length) return;
+  var thr=state.settings.threshold, yOf=function(v){return H-4-(v/100)*(H-12);};
+  x.strokeStyle="rgba(255,255,255,.3)"; x.lineWidth=1; x.setLineDash([4,4]);
+  x.beginPath(); x.moveTo(0,yOf(thr)); x.lineTo(W,yOf(thr)); x.stroke(); x.setLineDash([]);
+  var st=W/Math.max(1,h.length-1);
+  x.beginPath(); x.moveTo(0,H);
+  for(var i=0;i<h.length;i++) x.lineTo(i*st,yOf(h[i]));
+  x.lineTo((h.length-1)*st,H); x.closePath();
+  x.fillStyle="rgba(255,255,255,.14)"; x.fill();
+  x.beginPath();
+  for(var j=0;j<h.length;j++){ var px=j*st,py=yOf(h[j]); j?x.lineTo(px,py):x.moveTo(px,py); }
+  x.strokeStyle="#fff"; x.lineWidth=2; x.lineJoin="round"; x.stroke();
+  try{ $("#sumCard").scrollIntoView({behavior:state.settings.motion?"smooth":"auto",block:"nearest"}); }catch(e){}
+}
+
+/* ============================================================
+   CHESTS
+   ============================================================ */
+function poolFor(chest,tier){
+  return DEX.filter(function(d){return d.chest===chest&&d.tier===tier;});
+}
+function rollTier(profile){
+  var o=ODDS[profile], r=Math.random()*100, acc=0;
+  for(var i=0;i<TIERS.length;i++){ acc+=o[TIERS[i]]; if(r<acc) return TIERS[i]; }
+  return "common";
+}
+function rollSpecimen(chestKey){
+  var prof=CHESTS[chestKey].odds, tier=rollTier(prof), pool=poolFor(chestKey,tier);
+  var guard=0;
+  while(!pool.length&&guard++<8){ tier=rollTier(prof); pool=poolFor(chestKey,tier); }
+  if(!pool.length){ pool=poolFor(chestKey,"common"); tier="common"; }
+  return pool[Math.floor(Math.random()*pool.length)];
+}
+function renderChests(){
+  var g=$("#cgrid");
+  g.innerHTML=Object.keys(CHESTS).map(function(k){
+    var c=CHESTS[k], o=ODDS[c.odds], poor=state.ions<c.cost;
+    var have=DEX.filter(function(d){return d.chest===k&&state.owned[d.id];}).length;
+    var tot=DEX.filter(function(d){return d.chest===k;}).length;
+    return '<button class="chest'+(poor?" poor":"")+'" data-c="'+k+'" style="border-left:3px solid '+c.accent+'">'+
+      '<span class="art" style="background:radial-gradient(circle,'+c.accent+'2A 0%,transparent 72%)">'+chestArt(k)+'</span>'+
+      '<span class="meta"><span class="nm">'+c.name+'</span>'+
+      '<span class="sb">'+have+' of '+tot+' collected</span>'+
+      '<span class="od" style="border-color:'+c.accent+'55;color:'+c.accent+'">Mythic '+o.mythic+'% / Epic '+o.epic+'%</span></span>'+
+      '<span class="cost"><b style="color:'+c.accent+'">'+c.cost+'</b><small>Ions</small></span></button>';
+  }).join("");
+  $$("#cgrid .chest").forEach(function(b){
+    b.onclick=function(){openChest(b.dataset.c);};
+  });
+  var dt=$("#dupTb");
+  dt.innerHTML="<tr><th>Tier</th><th>Refund</th></tr>"+TIERS.map(function(t){
+    return '<tr><td>'+TIER_NUM[t]+' &middot; '+TIER_NAME[t]+'</td><td>'+REFUND[t]+'</td></tr>';
+  }).join("");
+  $("#dexN").textContent=Object.keys(state.owned).length+"/"+DEX.length;
+}
+function openChest(key){
+  var c=CHESTS[key];
+  if(state.ions<c.cost) return toast("Need "+(c.cost-state.ions)+" more Ions");
+  setIons(state.ions-c.cost);
+  state.pendingChest=key;
+  var spec=rollSpecimen(key);
+  runReveal(key,spec);
+}
+function runReveal(key,spec){
+  var rv=$("#rev"), art=$("#revArt"), slot=$("#revSlot"), pl=$("#revPl");
+  rv.classList.add("on");
+  $("#revMeta").classList.remove("in");
+  $("#rays").style.opacity="0";
+  $("#revNew").classList.add("hidden");
+  $("#revDup").classList.add("hidden");
+  slot.innerHTML=chestArt(key);
+  pl.style.background="#141414";
+  art.style.boxShadow="none";
+  var motion=state.settings.motion;
+  if(motion) $("#shk").classList.add("shaking");
+  Haptics.buildUp();
+  setTimeout(function(){
+    $("#shk").classList.remove("shaking");
+    slot.innerHTML=svg(spec.id);
+    pl.style.background=plateBg(spec.tier);
+    art.className=spec.tier==="mythic"?"myth":"";
+    $("#revRar").textContent=TIER_NUM[spec.tier]+" \u00B7 "+TIER_NAME[spec.tier];
+    $("#revRar").style.color=TIER_COL[spec.tier][0];
+    $("#revName").textContent=spec.name;
+    $("#revFact").textContent=spec.fact;
+    if(spec.tier==="mythic"||spec.tier==="epic") $("#rays").style.opacity="1";
+    var rec=state.owned[spec.id];
+    if(!rec){
+      state.owned[spec.id]={n:1,first:new Date().toISOString()};
+      $("#revNew").classList.remove("hidden");
+      Haptics.reveal(spec.tier); setTimeout(function(){Haptics.newSpecimen();},520);
+    }else{
+      rec.n++;
+      var back=REFUND[spec.tier];
+      setIons(state.ions+back);
+      $("#revDup").textContent="Duplicate · +"+back+" Ions returned";
+      $("#revDup").classList.remove("hidden");
+      Haptics.reveal(spec.tier);
+    }
+    saveDex();
+    if(motion) burst(spec.tier);
+    $("#revMeta").classList.add("in");
+    var again=$("#revAgain");
+    var cost=CHESTS[key].cost;
+    again.textContent = state.ions>=cost ? "Open again · "+cost : "Not enough Ions";
+    again.disabled = state.ions<cost;
+    renderChests(); $("#dexN").textContent=Object.keys(state.owned).length+"/"+DEX.length;
+  }, motion?1150:120);
+}
+function burst(tier){
+  // Web Animations is near-universal now, but old WebViews still miss it
+  if(typeof document.createElement("div").animate!=="function") return;
+  var n={common:8,uncommon:12,rare:16,epic:24,mythic:34}[tier]||8;
+  var box=$("#revBox");
+  for(var i=0;i<n;i++){
+    var d=document.createElement("div");
+    d.className="burst";
+    d.style.background="#fff";
+    d.style.opacity=i%3===0?"1":".55";
+    box.appendChild(d);
+    var a=Math.random()*Math.PI*2, dist=90+Math.random()*170;
+    d.animate([
+      {transform:"translate(-50%,-50%) scale(.3) rotate(0deg)",opacity:1},
+      {transform:"translate("+(Math.cos(a)*dist-50)+"%,"+(Math.sin(a)*dist-50)+"%) scale(1) rotate("+(Math.random()*720-360)+"deg)",opacity:0}
+    ],{duration:750+Math.random()*550,easing:"cubic-bezier(.2,.7,.3,1)"}).onfinish=(function(el){
+      return function(){ el.remove(); };
+    })(d);
+  }
+}
+function closeReveal(){
+  $("#rev").classList.remove("on");
+  $("#rays").style.opacity="0";
+  $("#shk").classList.remove("shaking");
+}
+
+/* ============================================================
+   DEX
+   ============================================================ */
+var dexFilter="all";
+function renderFilters(){
+  var f=[["all","All"]].concat(Object.keys(CHESTS).map(function(k){return [k,CHESTS[k].name];}));
+  $("#filt").innerHTML=f.map(function(x){
+    return '<button class="chip'+(dexFilter===x[0]?" on":"")+'" data-f="'+x[0]+'">'+x[1]+'</button>';
+  }).join("");
+  $$("#filt .chip").forEach(function(b){
+    b.onclick=function(){dexFilter=b.dataset.f;renderFilters();renderDex();Haptics.tap();};
+  });
+}
+function renderDex(){
+  var list=DEX.filter(function(d){return dexFilter==="all"||d.chest===dexFilter;});
+  $("#dgrid").innerHTML=list.map(function(d){
+    var rec=state.owned[d.id], lk=!rec;
+    return '<button class="cellc'+(lk?" lk":"")+'" data-id="'+d.id+'">'+
+      '<span class="plate'+(!lk&&d.tier==="mythic"?" myth":"")+'" style="background:'+
+        (lk?"":plateBg(d.tier))+'">'+svg(d.id)+
+      (rec&&rec.n>1?'<span class="ct">x'+rec.n+'</span>':'')+'</span>'+
+      '<span class="cap"><span class="nm">'+(lk?"Unknown":d.name)+'</span>'+
+      '<span class="tr">'+TIER_NUM[d.tier]+' \u00B7 '+(lk?"???":TIER_NAME[d.tier])+'</span></span></button>';
+  }).join("");
+  $$("#dgrid .cellc").forEach(function(b){
+    b.onclick=function(){showSpec(b.dataset.id);};
+  });
+  $("#dexN").textContent=Object.keys(state.owned).length+"/"+DEX.length;
+}
+function showSpec(id){
+  var d=BY_ID[id], rec=state.owned[id];
+  var html;
+  if(!rec){
+    html='<div style="text-align:center;padding:4px 0">'+
+      '<div style="width:130px;height:130px;margin:0 auto;background:var(--panel2);border:1px solid var(--line);'+
+      'display:grid;place-items:center"><div style="width:78%;opacity:.08;filter:grayscale(1) brightness(3)">'+
+      svg(id)+'</div></div>'+
+      '<div class="eb" style="margin-top:16px">'+TIER_NUM[d.tier]+' \u00B7 '+TIER_NAME[d.tier]+'</div>'+
+      '<h3 class="h-md" style="margin-top:9px">Not collected</h3>'+
+      '<p class="dim" style="font-size:13.5px;margin:11px 0 0">Found in the <b style="color:#fff">'+
+      CHESTS[d.chest].name+'</b> chest.</p>'+
+      '<div style="margin-top:20px"><button class="btn wide" id="shGo">Go to chests</button></div></div>';
+  }else{
+    var dt=new Date(rec.first);
+    html='<div style="text-align:center">'+
+      '<div class="'+(d.tier==="mythic"?"myth":"")+'" style="width:152px;height:152px;margin:0 auto;'+
+      'display:grid;place-items:center;background:'+plateBg(d.tier)+';border:1px solid var(--line2)">'+
+      '<div style="width:82%">'+svg(id)+'</div></div>'+
+      '<div class="eb" style="margin-top:17px">'+TIER_NUM[d.tier]+' \u00B7 '+TIER_NAME[d.tier]+
+      ' \u00B7 '+CHESTS[d.chest].name+'</div>'+
+      '<h3 class="h-md" style="margin-top:9px">'+d.name+'</h3></div>'+
+      '<p class="dim" style="font-size:14px;line-height:1.62;margin:16px 0 0">'+d.fact+'</p>'+
+      '<div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--line);display:flex;gap:20px">'+
+      '<div style="flex:1"><div class="eb">Specimen</div><div style="font-family:var(--disp);font-weight:700;font-size:17px;margin-top:5px">#'+String(d.no).padStart(2,"0")+'</div></div>'+
+      '<div style="flex:1"><div class="eb">Copies</div><div style="font-family:var(--disp);font-weight:700;font-size:17px;margin-top:5px">'+rec.n+'</div></div>'+
+      '<div style="flex:1.5"><div class="eb">First found</div><div style="font-family:var(--disp);font-weight:700;font-size:17px;margin-top:5px">'+
+      (dt.getMonth()+1)+"/"+dt.getDate()+"/"+String(dt.getFullYear()).slice(2)+'</div></div></div>';
+  }
+  $("#shC").innerHTML=html;
+  openSheet();
+  var gob=$("#shGo"); if(gob) gob.onclick=function(){closeSheet();goTab("chests");};
+}
+function openSheet(){
+  var s=$("#sheet"); s.classList.add("on");
+  requestAnimationFrame(function(){s.classList.add("in");});
+  Haptics.tap();
+}
+function closeSheet(){
+  var s=$("#sheet"); s.classList.remove("in");
+  setTimeout(function(){s.classList.remove("on");},260);
+}
+
+/* ============================================================
+   PROGRESS
+   ============================================================ */
+function renderStats(){
+  $("#kStreak").textContent=state.streak;
+  $("#kTime").textContent=fmtDur(state.totalSec);
+  $("#kSess").textContent=state.sessions.length;
+  var real=state.sessions;
+  $("#kAvg").textContent=real.length?Math.round(real.reduce(function(a,s){return a+s.avg;},0)/real.length):"--";
+  drawHist();
+  $("#prgList").innerHTML=Object.keys(CHESTS).map(function(k){
+    var tot=DEX.filter(function(d){return d.chest===k;}).length;
+    var have=DEX.filter(function(d){return d.chest===k&&state.owned[d.id];}).length;
+    var pct=Math.round(100*have/tot);
+    return '<div class="prg"><div class="pl"><span>'+CHESTS[k].name+'</span><b>'+have+'/'+tot+'</b></div>'+
+      '<div class="pb"><i style="width:'+pct+'%"></i></div></div>';
+  }).join("");
+  var ot=$("#oddsTb");
+  ot.innerHTML="<tr><th>Chest</th>"+TIERS.map(function(t){return "<th>"+TIER_NAME[t].slice(0,4)+"</th>";}).join("")+"<th>Cost</th></tr>"+
+    Object.keys(CHESTS).map(function(k){
+      var o=ODDS[CHESTS[k].odds];
+      return "<tr><td>"+CHESTS[k].name+"</td>"+TIERS.map(function(t){return "<td>"+o[t]+"</td>";}).join("")+
+        "<td>"+CHESTS[k].cost+"</td></tr>";
+    }).join("");
+  renderSettings();
+  refreshMneState();
+}
+function refreshMneState(){
+  var t=$("#mneState"); if(!t) return;
+  var r=state.lastRaw;
+  if(!r){ t.textContent="No raw capture"; t.className="tag"; return; }
+  var mins=(r.samples.length/r.fs/60).toFixed(1);
+  t.textContent=mins+"m captured"+(r.capped?" · capped":"");
+  t.className="tag ok";
+}
+function downloadRaw(){
+  if(!state.lastRaw) return toast("No raw capture yet — enable it in Settings and run a session");
+  var blob=new Blob([JSON.stringify({fs:state.lastRaw.fs,samples:state.lastRaw.samples})],{type:"application/json"});
+  var a=document.createElement("a");
+  a.href=URL.createObjectURL(blob); a.download="neurodex-session-raw.json";
+  document.body.appendChild(a); a.click(); a.remove();
+}
+async function runMneAudit(){
+  if(!state.lastRaw) return toast("No raw capture yet — enable it in Settings and run a session");
+  var out=$("#mneOut"), btn=$("#mneRun");
+  btn.disabled=true; btn.textContent="Analyzing…";
+  out.innerHTML='<div class="note">Sending the session to <code>/api/analyze-artifacts</code>…</div>';
+  try{
+    var res=await fetch("/api/analyze-artifacts",{
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({fs:state.lastRaw.fs,samples:state.lastRaw.samples})
+    });
+    if(!res.ok) throw new Error("Endpoint returned "+res.status);
+    var j=await res.json();
+    var pct=(100*j.reject_fraction).toFixed(1);
+    out.innerHTML=
+      '<div class="kv"><span>MNE reject fraction</span><span>'+pct+'%</span></div>'+
+      '<div class="kv"><span>Bad segments</span><span>'+(j.bad_segments?j.bad_segments.length:0)+'</span></div>'+
+      '<div class="kv"><span>Muscle artifact time</span><span>'+(j.muscle_seconds||0).toFixed(1)+'s</span></div>'+
+      '<div class="kv"><span>Amplitude artifact time</span><span>'+(j.amplitude_seconds||0).toFixed(1)+'s</span></div>'+
+      '<p class="dim" style="font-size:12.5px;margin:10px 0 0">Compare this against the live reject rate on the '+
+      '<a href="#/models" style="color:#fff;text-decoration:underline">Models</a> tab for the same session.</p>';
+  }catch(e){
+    out.innerHTML='<div class="note">Could not reach the MNE endpoint ('+(e.message||"network error")+
+      '). If this is running as a static file, or the Python function isn\'t deployed yet, download the '+
+      'raw capture instead and run <code>api/analyze-artifacts.py</code> locally: '+
+      '<code>python api/analyze-artifacts.py neurodex-session-raw.json</code>.</div>';
+  }
+  btn.disabled=false; btn.textContent="Analyze with MNE";
+}
+function drawHist(){
+  var c=$("#hist"), g=fitCanvas(c); if(!g) return;
+  var x=g.x, W=g.w, H=g.h;
+  x.clearRect(0,0,W,H);
+  var s=state.sessions.slice(-16);
+  if(s.length===0){
+    $("#histNote").textContent="No sessions yet";
+  }else if(s.length===1){
+    $("#histNote").textContent="Your most recent session";
+  }else{
+    $("#histNote").textContent="Last "+s.length+" sessions, oldest to newest";
+  }
+  var padL=26, padR=8, padT=16, padB=18;
+  var plotW=W-padL-padR, plotH=H-padT-padB;
+  if(!s.length){
+    x.strokeStyle="rgba(255,255,255,.12)"; x.lineWidth=1;
+    x.beginPath(); x.moveTo(padL,H-padB); x.lineTo(W-padR,H-padB); x.stroke(); return;
+  }
+  var yOf=function(v){return padT+plotH-(v/100)*plotH;};
+  // axis: gridlines with their value, so the bar heights mean something at a glance
+  x.font="400 8.5px JetBrains Mono,monospace"; x.textAlign="right";
+  [0,50,100].forEach(function(v){
+    var y=yOf(v);
+    x.strokeStyle=v===0?"rgba(255,255,255,.28)":"rgba(255,255,255,.09)"; x.lineWidth=1;
+    x.beginPath(); x.moveTo(padL,y); x.lineTo(W-padR,y); x.stroke();
+    x.fillStyle="rgba(255,255,255,.4)"; x.fillText(""+v,padL-6,y+3);
+  });
+  x.strokeStyle="rgba(255,255,255,.45)"; x.setLineDash([3,3]); x.lineWidth=1;
+  var ty=yOf(state.settings.threshold);
+  x.beginPath(); x.moveTo(padL,ty); x.lineTo(W-padR,ty); x.stroke(); x.setLineDash([]);
+
+  // fixed-width bars that pack from the left, so 1 session and 16 sessions both read cleanly
+  var maxBw=36, gap=10, bw=Math.min(maxBw,(plotW-gap*(s.length-1))/s.length);
+  var rowW=s.length*bw+(s.length-1)*gap, startX=padL+(plotW-rowW)/2;
+  x.textAlign="center";
+  s.forEach(function(sess,i){
+    var atTarget=sess.avg>=state.settings.threshold;
+    var barH=(sess.avg/100)*plotH, y=padT+plotH-barH, rx=startX+i*(bw+gap), r=Math.min(5,bw/2);
+    var grd=x.createLinearGradient(0,y,0,padT+plotH);
+    grd.addColorStop(0,atTarget?"#FFFFFF":"rgba(255,255,255,.34)");
+    grd.addColorStop(1,atTarget?"#9A9A9A":"rgba(255,255,255,.14)");
+    x.fillStyle=grd;
+    x.beginPath();
+    x.moveTo(rx,padT+plotH); x.lineTo(rx,y+r);
+    x.quadraticCurveTo(rx,y,rx+r,y); x.lineTo(rx+bw-r,y);
+    x.quadraticCurveTo(rx+bw,y,rx+bw,y+r); x.lineTo(rx+bw,padT+plotH);
+    x.closePath(); x.fill();
+    x.fillStyle="rgba(255,255,255,.62)"; x.font="500 9px JetBrains Mono,monospace";
+    x.fillText(""+sess.avg,rx+bw/2,Math.max(10,y-5));
+  });
+}
+function renderSettings(){
+  var s=state.settings;
+  var rows=[
+    {k:"haptics",lb:"Haptic feedback",sb:Haptics.supported?
+      "Buzz when you cross into the target band, and on every chest reveal.":
+      "Not available in this browser. iOS Safari exposes no vibration API, so use the native build for haptics on iPhone.",
+      v:s.haptics&&Haptics.supported,dis:!Haptics.supported},
+    {k:"audio",lb:"Sound cues",sb:"Stands in for haptics where vibration is blocked.",v:s.audio},
+    {k:"motion",lb:"Animation",sb:"Turn off to skip the chest shake and the particle burst.",v:s.motion},
+    {k:"recordRaw",lb:"Record raw for MNE audit",sb:"Keeps the full-resolution waveform for your next session in memory (not saved to your profile) so it can be run through the MNE artifact check on the Progress tab. Off by default; adds nothing to Export save.",v:s.recordRaw}
+  ];
+  var html=rows.map(function(r){
+    return '<div class="sw"><div><div class="lb">'+r.lb+'</div><div class="sb">'+r.sb+'</div></div>'+
+      '<button class="tog'+(r.v?" on":"")+(r.dis?" dis":"")+'" data-k="'+r.k+'"></button></div>';
+  }).join("");
+  html+='<div style="padding:13px 0;border-bottom:2px solid var(--card2)">'+
+    '<div class="lb d" style="font-size:14.5px">Baseline length</div>'+
+    '<div class="sb" style="margin:2px 0 9px">How long the app measures your resting signal before scoring starts.</div>'+
+    '<div class="seg" id="calSeg">'+[20,45,60].map(function(v){
+      return '<button data-v="'+v+'"'+(s.calSec===v?' class="on"':'')+'>'+v+'s</button>';}).join("")+'</div></div>';
+  html+='<div style="padding:13px 0">'+
+    '<div class="lb d" style="font-size:14.5px">Target band</div>'+
+    '<div class="sb" style="margin:2px 0 9px">The index you have to hold to count as in band and earn the buzz.</div>'+
+    '<div class="seg" id="thrSeg">'+[[58,"Easy"],[65,"Normal"],[74,"Hard"]].map(function(v){
+      return '<button data-v="'+v[0]+'"'+(s.threshold===v[0]?' class="on"':'')+'>'+v[1]+' '+v[0]+'</button>';}).join("")+'</div></div>';
+  $("#setList").innerHTML=html;
+  $$("#setList .tog").forEach(function(b){
+    if(b.classList.contains("dis")) return;
+    b.onclick=function(){
+      var k=b.dataset.k; s[k]=!s[k]; b.classList.toggle("on",s[k]);
+      Haptics.on=s.haptics; Haptics.audio=s.audio;
+      document.body.classList.toggle("norm",!s.motion);
+      saveSettings(); Haptics.tap();
+      if(k==="audio"&&s.audio) Haptics._beep(700,150,0.12);
+    };
+  });
+  $$("#calSeg button").forEach(function(b){
+    b.onclick=function(){s.calSec=+b.dataset.v;saveSettings();renderSettings();Haptics.tap();};
+  });
+  $$("#thrSeg button").forEach(function(b){
+    b.onclick=function(){s.threshold=+b.dataset.v;saveSettings();renderSettings();Haptics.tap();};
+  });
+}
+
+/* ---------- export / reset ---------- */
+function exportSave(){
+  var data={version:1,exported:new Date().toISOString(),ions:state.ions,streak:state.streak,
+    totalSeconds:state.totalSec,owned:state.owned,sessions:state.sessions,settings:state.settings};
+  var blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+  var a=document.createElement("a");
+  a.href=URL.createObjectURL(blob); a.download="neurodex-save.json";
+  document.body.appendChild(a); a.click(); a.remove();
+  toast("Save exported");
+}
+function confirmReset(){
+  $("#shC").innerHTML='<div style="text-align:center;padding:6px 0">'+
+    '<div class="d" style="font-size:23px">Reset everything?</div>'+
+    '<p style="font-size:13.5px;font-weight:700;color:var(--txt2);margin:9px 0 0">'+
+    'Clears your collection, Ions, streak and all session history. This cannot be undone.</p>'+
+    '<div style="display:flex;gap:9px;margin-top:18px">'+
+    '<button class="btn grey" id="rNo">Keep it</button>'+
+    '<button class="btn coral" id="rYes">Reset</button></div></div>';
+  openSheet();
+  $("#rNo").onclick=closeSheet;
+  $("#rYes").onclick=async function(){
+    await Store.clear(KEYS);
+    state.ions=0; state.owned={}; state.sessions=[]; state.streak=0; state.lastDay=null; state.totalSec=0;
+    setIons(0); saveProfile(); saveDex(); saveSessions();
+    closeSheet(); renderDex(); renderStats(); renderChests();
+    toast("Everything reset");
+  };
+}
+
+/* ============================================================
+   SITE: ROUTER
+   ============================================================ */
+const PAGES=["home","app","models","research","contact"];
+var curPage="home";
+function route(name,push){
+  if(PAGES.indexOf(name)<0) name="home";
+  curPage=name;
+  PAGES.forEach(function(p){
+    var el=$("#page-"+p); if(el) el.classList.toggle("hidden",p!==name);
+  });
+  $$("#navlinks a,#drawer a").forEach(function(a){
+    a.classList.toggle("on",a.dataset.r===name);
+  });
+  $("#tabs").classList.toggle("on",name==="app");
+  $("#appwrap").classList.toggle("act",name==="app");
+  closeDrawer();
+  if(push && location.hash!=="#/"+name) location.hash="#/"+name;
+  try{ window.scrollTo(0,0); }catch(e){}
+  if(name==="models") renderModels();
+  if(name==="app") { renderChests(); renderDex(); renderStats(); }
+  if(name==="home") startHeroFallback(); else stopHeroFallback();
+}
+function readHash(){
+  var h=(location.hash||"").replace(/^#\/?/,"").split("?")[0];
+  return PAGES.indexOf(h)>=0?h:"home";
+}
+function closeDrawer(){ $("#drawer").classList.remove("on"); $("#burger").classList.remove("x"); }
+
+/* ============================================================
+   SITE: HOME
+   ============================================================ */
+const FOUNDERS=[
+  {name:"Founder One",role:"Signal processing",init:"F1",
+   bio:"Replace this card with a real bio. Owns the filter stack and the scoring model."},
+  {name:"Founder Two",role:"Neuroscience",init:"F2",
+   bio:"Replace this card with a real bio. Owns study design and the specimen science."},
+  {name:"Founder Three",role:"Product and design",init:"F3",
+   bio:"Replace this card with a real bio. Owns the interface and the collection loop."},
+  {name:"Founder Four",role:"Hardware",init:"F4",
+   bio:"Replace this card with a real bio. Owns the bridge and headset integration."}
+];
+function renderFounders(){
+  var el=$("#founders"); if(!el) return;
+  el.innerHTML=FOUNDERS.map(function(f){
+    return '<div class="fcard"><div class="fportrait">'+
+      (f.photo?'<img src="'+f.photo+'" alt="'+f.name+'">':'<span class="init">'+f.init+'</span>')+
+      '</div><div class="fbody"><h4 class="h-sm">'+f.name+'</h4>'+
+      '<div class="role">'+f.role+'</div><p>'+f.bio+'</p></div></div>';
+  }).join("");
+}
+/* animated EEG trace behind the hero until a real video is dropped in */
+var heroRaf=null, heroT=0;
+/* Hero visual: a stylized two-trace EEG readout — a slow, high-amplitude
+   theta line and a fast, low-amplitude gamma line, on a faint grid, with a
+   sweeping playhead like a real EEG monitor. This is illustrative, not a
+   real recording — the app's own live waveform (Session tab) is the real
+   one. */
+function startHeroFallback(){
+  var c=$("#heroFallback");
+  if(!c) return;
+  c.classList.remove("hidden");
+  if(heroRaf) return;
+  var draw=function(){
+    var g=fitCanvas(c);
+    if(g){
+      var x=g.x,W=g.w,H=g.h;
+      x.clearRect(0,0,W,H);
+
+      // faint EEG-paper grid
+      x.strokeStyle="rgba(255,255,255,0.045)"; x.lineWidth=1;
+      var gap=Math.max(28,W/26);
+      for(var gx=0; gx<W; gx+=gap){ x.beginPath(); x.moveTo(gx,0); x.lineTo(gx,H); x.stroke(); }
+      for(var gy=0; gy<H; gy+=gap){ x.beginPath(); x.moveTo(0,gy); x.lineTo(W,gy); x.stroke(); }
+
+      var thetaY=H*0.36, gammaY=H*0.64;
+
+      // theta trace — slow, wide, the dysrhythmic band
+      x.strokeStyle="rgba(255,255,255,0.34)"; x.lineWidth=1.6; x.beginPath();
+      for(var px=0; px<=W; px+=2){
+        var t=px/W*6+heroT*0.55;
+        var y=thetaY+Math.sin(t*2.2)*H*0.085+Math.sin(t*4.4+1.3)*H*0.02;
+        px?x.lineTo(px,y):x.moveTo(px,y);
+      }
+      x.stroke();
+
+      // gamma trace — fast, low-amplitude, the normal target
+      x.strokeStyle="rgba(255,255,255,0.20)"; x.lineWidth=1.1; x.beginPath();
+      for(var px2=0; px2<=W; px2+=2){
+        var t2=px2/W*6+heroT*0.55;
+        var y2=gammaY+Math.sin(t2*14.5)*H*0.028+Math.sin(t2*23+2.1)*H*0.014;
+        px2?x.lineTo(px2,y2):x.moveTo(px2,y2);
+      }
+      x.stroke();
+
+      // sweeping playhead, like a bedside monitor
+      var sweepX=(heroT*90)%W;
+      var grad=x.createLinearGradient(sweepX-70,0,sweepX,0);
+      grad.addColorStop(0,"rgba(255,255,255,0)"); grad.addColorStop(1,"rgba(255,255,255,0.16)");
+      x.fillStyle=grad; x.fillRect(sweepX-70,0,70,H);
+
+      heroT+=0.012;
+    }
+    heroRaf=requestAnimationFrame(draw);
+  };
+  draw();
+}
+function stopHeroFallback(){ if(heroRaf){cancelAnimationFrame(heroRaf);heroRaf=null;} }
+
+/* ============================================================
+   SITE: MODELS (artifact filters)
+   ============================================================ */
+function renderModels(){
+  var el=$("#modelList"); if(!el) return;
+  el.innerHTML=FILTER_DEFS.map(function(f){
+    var c=Filters.cfg[f.key], st=Filters.stats[f.key];
+    var rate=st.checked?(100*st.rejected/st.checked):0;
+    var ctl="";
+    if(f.param){
+      ctl='<div style="margin-top:15px;padding-top:14px;border-top:1px solid var(--line)">'+
+        '<div class="row" style="margin-bottom:9px">'+
+        '<span class="eb">'+f.param+'</span>'+
+        '<span class="mono" style="font-size:12px" id="fv-'+f.key+'">'+c.val+(f.unit?" "+f.unit:"")+'</span></div>'+
+        '<input type="range" id="fr-'+f.key+'" min="'+f.min+'" max="'+f.max+'" step="'+f.step+'" value="'+c.val+'" '+
+        'style="width:100%;accent-color:#fff;background:transparent"></div>';
+    }
+    return '<div class="mrow"><div class="top"><div style="min-width:0">'+
+      '<div class="id">'+f.id+' \u00B7 '+(f.kind==="reject"?"Rejects windows":"Transforms window")+'</div>'+
+      '<h4 class="h-sm">'+f.name+'</h4></div>'+
+      '<button class="tog'+(c.on?" on":"")+'" data-f="'+f.key+'" aria-label="Toggle"></button></div>'+
+      '<p>'+f.blurb+'</p>'+
+      '<div class="mstat">'+
+        '<div><span>Windows seen</span><b class="num">'+st.checked+'</b></div>'+
+        (f.kind==="reject"?'<div><span>Rejected</span><b class="num">'+st.rejected+'</b></div>'+
+        '<div><span>Reject rate</span><b class="num">'+rate.toFixed(1)+'%</b></div>':
+        '<div><span>Mode</span><b style="font-size:13px">Always inline</b></div>')+
+      '</div>'+ctl+'</div>';
+  }).join("");
+  $$("#modelList .tog").forEach(function(b){
+    b.onclick=function(){
+      var k=b.dataset.f;
+      Filters.cfg[k].on=!Filters.cfg[k].on;
+      b.classList.toggle("on",Filters.cfg[k].on);
+      saveFilters(); updateFilterTotals();
+      toast((Filters.cfg[k].on?"Enabled ":"Disabled ")+k);
+    };
+  });
+  FILTER_DEFS.forEach(function(f){
+    if(!f.param) return;
+    var r=$("#fr-"+f.key); if(!r) return;
+    r.oninput=function(){
+      Filters.cfg[f.key].val=+r.value;
+      $("#fv-"+f.key).textContent=r.value+(f.unit?" "+f.unit:"");
+    };
+    r.onchange=function(){ saveFilters(); };
+  });
+  updateFilterTotals();
+}
+function updateFilterTotals(){
+  if(!$("#fAcc")) return;
+  var tot=Filters.accepted+Filters.rejected;
+  $("#fAcc").textContent=Filters.accepted;
+  $("#fRej").textContent=Filters.rejected;
+  $("#fRate").textContent=(tot?(100*Filters.rejected/tot).toFixed(1):"0.0")+"%";
+  $("#fOn").textContent=Filters.activeCount()+"/"+FILTER_DEFS.length;
+}
+function saveFilters(){
+  var out={};
+  Object.keys(Filters.cfg).forEach(function(k){out[k]={on:Filters.cfg[k].on,val:Filters.cfg[k].val};});
+  return Store.set("nd:filters",out);
+}
+
+/* ============================================================
+   SITE: RESEARCH (structure only, no entries yet)
+   ============================================================ */
+const RESEARCH=[
+  {n:"01",t:"Pilot 001 data",t2:"Datasets",d:"Anonymised session exports from the TCD pilot above, once baseline phenotyping actually runs.",status:"Empty"},
+  {n:"02",t:"Write-ups",d:"Findings, negative results and reproduction notes as sessions accumulate.",status:"Empty"},
+  {n:"03",t:"Next candidate",d:"The other five deep-mechanism ideas from early ideation are still on the shelf, pending which one gets built next.",status:"Not started"}
+];
+function renderResearch(){
+  var el=$("#researchGrid"); if(!el) return;
+  el.innerHTML=RESEARCH.map(function(r){
+    return '<div class="nc"><div class="n">'+r.n+'</div><h4 class="h-sm">'+r.t+'</h4>'+
+      '<p>'+r.d+'</p><div class="tag" style="margin-top:16px">'+r.status+'</div></div>';
+  }).join("");
+}
+
+/* ============================================================
+   SITE: CONTACT
+   ============================================================ */
+function validEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v); }
+function setFieldError(id,bad){ $("#"+id).classList.toggle("bad",bad); return !bad; }
+function wireContact(){
+  var f=$("#cForm"); if(!f) return;
+  ["cName","cEmail","cMsg"].forEach(function(id){
+    var el=$("#"+id); if(el) el.addEventListener("input",function(){
+      el.closest(".fld").classList.remove("bad");
+    });
+  });
+  f.addEventListener("submit",function(ev){
+    ev.preventDefault();
+    var name=$("#cName").value.trim(), email=$("#cEmail").value.trim(),
+        topic=$("#cTopic").value, msg=$("#cMsg").value.trim();
+    var ok=true;
+    ok=setFieldError("f-name",!name)&&ok;
+    ok=setFieldError("f-email",!validEmail(email))&&ok;
+    ok=setFieldError("f-msg",msg.length<10)&&ok;
+    if(!ok){ status("Check the highlighted fields",false); return; }
+    if($("#cForm").querySelector("[name=botfield]").value){ return; }  // honeypot
+    var btn=$("#cSend");
+    btn.disabled=true; btn.textContent="Sending…";
+    var body=JSON.stringify({name:name,email:email,topic:topic,message:msg});
+    var local=location.protocol==="file:";
+    var done=function(sent){
+      btn.disabled=false; btn.textContent="Send message";
+      if(sent){
+        f.reset();
+        status("Message sent. We'll come back to you at "+email,true);
+      }else{
+        var mail="mailto:hello@neurodex.app?subject="+encodeURIComponent("["+topic+"] "+name)+
+                 "&body="+encodeURIComponent(msg+"\n\n— "+name+" <"+email+">");
+        status("No form backend reachable here, so we opened your mail client instead.",true);
+        try{ window.location.href=mail; }catch(e){}
+      }
+    };
+    if(local) return done(false);
+    fetch("/api/contact",{method:"POST",headers:{"Content-Type":"application/json"},body:body})
+      .then(function(r){ done(r.ok); })
+      .catch(function(){ done(false); });
+  });
+}
+function status(msg,good){
+  var el=$("#cStatus");
+  el.innerHTML='<div class="'+(good?"note":"note")+'" style="'+(good?"":"border-left-color:#fff")+'">'+msg+'</div>';
+}
+
+/* ============================================================
+   BOOT
+   ============================================================ */
+async function load2(){
+  var f=await Store.get("nd:filters",null);
+  if(f) Filters.init(f);
+}
+async function boot(){
+  $("#yr").textContent=new Date().getFullYear();
+  buildTabs(); buildBands(); buildSigBars();
+  renderFounders(); renderResearch(); wireContact();
+  renderFilters(); // filter chips on the dex
+  await load();
+  await load2();
+  setIons(state.ions);
+  renderSources(); renderChests(); renderDex(); renderStats(); setQuality(null);
+
+  $$("#durSeg button").forEach(function(b){
+    b.onclick=function(){
+      if(state.running) return toast("Stop the session first");
+      state.durMin=+b.dataset.min;
+      $$("#durSeg button").forEach(function(o){o.classList.toggle("on",o===b);});
+      Haptics.tap();
+    };
+  });
+  $("#connBtn").onclick=connect;
+  $("#discBtn").onclick=function(){dropSource();renderSources();toast("Source dropped");};
+  $("#startBtn").onclick=startSession;
+  $("#stopBtn").onclick=function(){endSession(true);};
+  $("#toChests").onclick=function(){goTab("chests");};
+  $("#revClose").onclick=closeReveal;
+  $("#revAgain").onclick=function(){
+    var k=state.pendingChest;
+    if(!k||state.ions<CHESTS[k].cost) return;
+    setIons(state.ions-CHESTS[k].cost);
+    runReveal(k,rollSpecimen(k));
+  };
+  $("#shBg").onclick=closeSheet;
+  $("#expBtn").onclick=exportSave;
+  $("#rstBtn").onclick=confirmReset;
+  $("#mneDl").onclick=downloadRaw;
+  $("#mneRun").onclick=runMneAudit;
+  $("#fReset").onclick=function(){Filters.reset();renderModels();toast("Counters reset");};
+  $("#fDefaults").onclick=function(){Filters.restoreDefaults();saveFilters();renderModels();toast("Filters restored");};
+
+  // nav
+  $("#burger").onclick=function(){
+    var d=$("#drawer"); d.classList.toggle("on"); this.classList.toggle("x");
+  };
+  $$("#navlinks a,#drawer a,.brand,#foot a").forEach(function(a){
+    var h=a.getAttribute("href")||"";
+    if(h.indexOf("#/")!==0) return;
+    a.addEventListener("click",function(e){ e.preventDefault(); route(h.slice(2),true); });
+  });
+  window.addEventListener("hashchange",function(){ route(readHash(),false); });
+
+  document.addEventListener("visibilitychange",function(){
+    if(document.hidden&&state.running) endSession(true);
+  });
+  window.addEventListener("resize",function(){ if(curPage==="app") drawHist(); });
+  if(Store.mode==="memory") toast("Storage unavailable, progress won't persist");
+
+  route(readHash(),false);
+  tick();
+}
+
+window.NeuroDex={
+  state:state, DEX:DEX, BY_ID:BY_ID, CHESTS:CHESTS, ODDS:ODDS, REFUND:REFUND,
+  Store:Store, Haptics:Haptics, Scorer:Scorer, BandExtractor:BandExtractor,
+  Filters:Filters, FILTER_DEFS:FILTER_DEFS,
+  grant:function(n){setIons(state.ions+(n||1000));return state.ions;},
+  rollSpecimen:rollSpecimen, setIons:setIons, goTab:goTab, route:route
+};
+boot();
+
+</script>
+</body>
+</html>

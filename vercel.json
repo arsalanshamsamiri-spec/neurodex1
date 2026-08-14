@@ -1,0 +1,13 @@
+{
+  "framework": null,
+  "functions": {
+    "api/analyze-artifacts.py": {
+      "memory": 1024,
+      "maxDuration": 30
+    },
+    "api/contact.js": {
+      "memory": 128,
+      "maxDuration": 10
+    }
+  }
+}

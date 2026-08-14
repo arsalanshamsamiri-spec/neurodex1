@@ -1,0 +1,7 @@
+# Used only by api/analyze-artifacts.py (the offline MNE artifact-audit
+# endpoint). Pinned to versions verified against this file during
+# development; bump with care, mne's preprocessing API moves between
+# minor versions.
+mne==1.12.1
+numpy>=1.26,<3
+scipy>=1.11,<2
