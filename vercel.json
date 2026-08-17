@@ -9,11 +9,5 @@
     { "src": "/api/analyze-artifacts", "dest": "/api/analyze-artifacts.py" },
     { "src": "/api/contact", "dest": "/api/contact.js" },
     { "src": "/(.*)", "dest": "/index.html" }
-  ],
-  "functions": {
-    "api/analyze-artifacts.py": {
-      "memory": 1024,
-      "maxDuration": 30
-    }
-  }
+  ]
 }
